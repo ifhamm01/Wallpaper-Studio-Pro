@@ -1,5 +1,4 @@
 export const GENRES = [
-    // --- Original Genres ---
     {
         id: 'cyberpunk',
         name: 'Cyber City',
@@ -48,7 +47,6 @@ export const GENRES = [
         prompt: 'magical fantasy landscape, floating islands, mystical aurora',
         image: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&q=80'
     },
-    // --- New Aesthetic/Relatable Genres ---
     {
         id: 'pastel',
         name: 'Pastel Dreamscape',
@@ -76,7 +74,6 @@ export const GENRES = [
 ];
 
 export const STYLES = [
-    // --- Original Styles ---
     {
         id: 'minimal',
         name: 'Minimalist',
@@ -125,7 +122,6 @@ export const STYLES = [
         prompt: 'pixel art style, retro gaming aesthetic, 16-bit graphics',
         image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&q=80'
     },
-    // --- New Styles ---
     {
         id: 'anime',
         name: 'Anime Aesthetic',
@@ -175,7 +171,6 @@ export const STYLES = [
         image: 'https://images.unsplash.com/photo-1522067576569-804d9c7c251d?w=800&q=80'
     }
 ];
-
 export const COLOR_BIASES = [
     { id: null, name: 'None', color: 'bg-gray-600', border: 'border-white/30' },
     { id: 'red', name: 'Red', color: 'bg-red-600', border: '' },
@@ -213,5 +208,6 @@ export const APP_CONFIG = {
     WEBGL_PARTICLE_COUNT: 600,
     WEBGL_PARTICLE_COUNT_MOBILE: 300
 };
+
 
 

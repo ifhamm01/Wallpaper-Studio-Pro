@@ -156,7 +156,7 @@ export const STYLES = [
         id: 'lowpoly',
         name: 'Low Poly',
         prompt: 'low poly 3d render, sharp geometric shapes, pastel color palette, minimalist landscape',
-        image: 'https://images.unsplash.com/photo-1643143596361-a39511490214?q=80&w=2064&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
+        image: 'https://images.unsplash.com/photo-1643143596361-a39511490214'
     }
 ];
 export const COLOR_BIASES = [
@@ -196,6 +196,7 @@ export const APP_CONFIG = {
     WEBGL_PARTICLE_COUNT: 600,
     WEBGL_PARTICLE_COUNT_MOBILE: 300
 };
+
 
 
 

@@ -5,6 +5,85 @@ body {
     background-color: #000;
     color: white;
     overflow-x: hidden;
+    position: relative;
+}
+
+/* Premium Noise Texture Overlay */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.08;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 200px 200px;
+    mix-blend-mode: overlay;
+}
+
+/* Subtle Paper Grain for Glassmorphic Elements */
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.65' numOctaves='3' seed='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)' opacity='0.5'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 150px 150px;
+    animation: grain-shift 8s steps(10) infinite;
+}
+
+@keyframes grain-shift {
+
+    0%,
+    100% {
+        transform: translate(0, 0);
+    }
+
+    10% {
+        transform: translate(-5%, -10%);
+    }
+
+    20% {
+        transform: translate(-15%, 5%);
+    }
+
+    30% {
+        transform: translate(7%, -25%);
+    }
+
+    40% {
+        transform: translate(-5%, 25%);
+    }
+
+    50% {
+        transform: translate(-15%, 10%);
+    }
+
+    60% {
+        transform: translate(15%, 0%);
+    }
+
+    70% {
+        transform: translate(0%, 15%);
+    }
+
+    80% {
+        transform: translate(3%, 25%);
+    }
+
+    90% {
+        transform: translate(-10%, 10%);
+    }
 }
 
 /* WebGL Background */
@@ -33,13 +112,29 @@ body {
     background-size: cover;
     background-position: center;
 }
+.group button[onclick*="Slide"] {
+    transform-style: flat !important;
+    will-change: transform, opacity;
+    z-index: 100 !important;
+    position: absolute;
+    cursor: pointer;
+    pointer-events: auto;
+    /* FIX: Increase hit area significantly */
+    padding: 1.5rem !important; 
+    margin: -1rem; /* Offset the padding so visual center remains */
+}
 
+/* Reduce movement on click to prevent "missed" clicks */
+.group button[onclick*="Slide"]:active {
+    transform: scale(0.98) !important; /* Subtle scale instead of 0.95 */
+}
+/* Ensure the overlay doesn't block buttons */
 .carousel-overlay {
     background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.7));
     backdrop-filter: blur(2px);
     -webkit-backdrop-filter: blur(2px);
+    pointer-events: none; /* Critical: allows clicks to pass through to buttons */
 }
-
 /* Scrollbar Hide */
 .no-scrollbar::-webkit-scrollbar {
     display: none;

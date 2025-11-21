@@ -334,7 +334,7 @@ function updateCustomPromptPlaceholder() {
     const style = STYLES[state.activeStyleIndex].prompt;
     const color = state.selectedColorBias ? `, ${state.selectedColorBias} color palette` : '';
     const customColorText = state.customColor ? `, ${state.customColor} tones` : '';
-    const text = `${genre}, ${style}${color}${customColorText}. 8k resolution, highly detailed.`;
+    const text = `${genre}, ${style}${color}${customColorText}.wallpaper, highly detailed.`;
 
     const area = document.getElementById('custom-prompt');
     if (!area) return;
@@ -653,7 +653,7 @@ async function handleGenerate() {
     if (!finalPrompt || finalPrompt.trim() === '') {
         const color = state.selectedColorBias ? `, ${state.selectedColorBias} color palette` : '';
         const customColorText = state.customColor ? `, ${state.customColor} tones` : '';
-        finalPrompt = `${genre.prompt}, ${style.prompt}${color}${customColorText}. ${state.isDesktopMode ? 'Desktop' : 'Mobile'} wallpaper, 8k resolution, highly detailed, aesthetic.`;
+        finalPrompt = `${genre.prompt}, ${style.prompt}${color}${customColorText}. ${state.isDesktopMode ? 'Desktop' : 'Mobile'} wallpaper, aesthetic.`;
     }
 
     const w = parseInt(document.getElementById('width').value);
@@ -1083,4 +1083,5 @@ window.downloadFromModal = async function () {
     if (url) {
         await downloadImageDirect(url);
     }
+
 };

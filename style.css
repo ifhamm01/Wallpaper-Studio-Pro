@@ -119,7 +119,8 @@ body::after {
     -webkit-backdrop-filter: blur(2px);
 }
 
-
+/* Carousel Navigation Buttons - Fix for Parallax Clickability */
+/* Carousel Navigation Buttons - IMPROVED */
 .group button[onclick*="Slide"] {
     transform-style: flat !important;
     will-change: transform, opacity;
@@ -128,14 +129,25 @@ body::after {
     cursor: pointer;
     pointer-events: auto;
     /* FIX: Increase hit area significantly */
-    padding: 1.5rem !important; 
-    margin: -1rem; /* Offset the padding so visual center remains */
+    padding: 1.5rem !important;
+    margin: -1rem;
+    /* Offset the padding so visual center remains */
 }
 
 /* Reduce movement on click to prevent "missed" clicks */
 .group button[onclick*="Slide"]:active {
-    transform: scale(0.98) !important; /* Subtle scale instead of 0.95 */
+    transform: scale(0.98) !important;
+    /* Subtle scale instead of 0.95 */
 }
+
+.group button[onclick*="Slide"]:hover {
+    transform: scale(1.1) !important;
+}
+
+.group button[onclick*="Slide"]:active {
+    transform: scale(0.95) !important;
+}
+
 /* Scrollbar Hide */
 .no-scrollbar::-webkit-scrollbar {
     display: none;
@@ -453,4 +465,3 @@ body::after {
 * {
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
-

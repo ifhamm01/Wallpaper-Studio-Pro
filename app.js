@@ -703,7 +703,7 @@ function toggleShareMenu() {
     const menu = document.getElementById('share-menu');
     const nativeBtn = document.getElementById('native-share-btn');
     const nativeDivider = document.getElementById('native-share-divider');
-
+    
     // Check for native support and show/hide the button
     // This assumes you added buttons with these IDs in index.html (as suggested previously)
     if (nativeBtn && nativeDivider) {
@@ -715,13 +715,13 @@ function toggleShareMenu() {
             nativeDivider.classList.add('hidden');
         }
     }
-
+    
     menu.classList.toggle('active');
 }
 
 async function shareImage(platform) {
     const url = document.getElementById('result-image').src;
-
+    
     if (!url) {
         showToast('No image to share.', 'error');
         toggleShareMenu(); // Close the menu if no image
@@ -750,28 +750,28 @@ async function shareImage(platform) {
                 }
             }
             break;
-
+            
         case 'download':
             await downloadImageDirect(url);
             break;
-
+            
         case 'copy':
             copyToClipboard(url);
             showToast('Image link copied to clipboard!', 'success');
             break;
-
+            
         case 'twitter':
             // Create a specific, detailed share link for X/Twitter
             const twitterText = encodeURIComponent(shareOptions.text + ' ' + shareOptions.url);
             window.open(`https://twitter.com/intent/tweet?text=${twitterText}`, '_blank');
             break;
-
+            
         case 'facebook':
             // Facebook uses the image URL as the main share content
             window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareOptions.url)}`, '_blank');
             break;
     }
-
+    
     // Close the share menu for non-native actions (Native share closes itself)
     if (platform !== 'native') {
         toggleShareMenu();

@@ -86,26 +86,49 @@ body::after {
     background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.7));
     backdrop-filter: blur(2px);
     -webkit-backdrop-filter: blur(2px);
-    /* FIX: Allow clicks to pass through overlay to buttons */
     pointer-events: none;
 }
 
-/* Carousel Navigation Buttons - Fix for Clickability */
+/* --- MODIFIED: Navigation Buttons (Large & Static) --- */
 .group button[onclick*="Slide"] {
     transform-style: flat !important;
     will-change: transform, opacity;
-    z-index: 50 !important; /* Raised Z-Index */
+    z-index: 50 !important;
     position: absolute;
     cursor: pointer;
-    pointer-events: auto !important; /* Force clickability */
+    pointer-events: auto !important;
+    
+    /* Force Visible and Large */
+    opacity: 1 !important;
+    width: 56px !important;
+    height: 56px !important;
+    background-color: rgba(0, 0, 0, 0.4) !important;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.15);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* Remove hover scale animation */
+    transform: translateY(-50%) !important;
+    transition: background-color 0.2s ease !important;
 }
 
+/* Only change brightness on hover */
 .group button[onclick*="Slide"]:hover {
-    transform: scale(1.1) !important;
+    background-color: rgba(255, 255, 255, 0.3) !important;
+    transform: translateY(-50%) !important; /* Ensure it doesn't move */
 }
 
 .group button[onclick*="Slide"]:active {
-    transform: scale(0.95) !important;
+    background-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Make Icons Bigger */
+.group button[onclick*="Slide"] svg {
+    width: 32px !important;
+    height: 32px !important;
 }
 
 /* Scrollbar Hide */
@@ -118,9 +141,17 @@ body::after {
     scrollbar-width: none;
 }
 
-/* 3D Tilt Container */
+/* --- MODIFIED: Main Container (Removed Parallax) --- */
 .perspective-container {
-    perspective: 1000px;
+    /* Removed perspective: 1000px; */
+    position: relative;
+}
+
+/* Floating Animation Keyframes */
+@keyframes float-card {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
 }
 
 .split-card-container {
@@ -129,14 +160,22 @@ body::after {
     border-radius: 2.5rem;
     overflow: hidden;
     position: relative;
+    
+    /* FIX: Ensure card sits above noise (z-index 1 & 2) */
+    z-index: 10; 
+    
     border: 2px solid rgba(255, 255, 255, 0.1);
     background: rgba(26, 26, 26, 0.4);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37),
         inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
-    transition: height 0.3s ease, width 0.3s ease, transform 0.1s ease-out;
-    transform-style: preserve-3d;
+        
+    /* Applied Simple Animation */
+    animation: float-card 6s ease-in-out infinite;
+    transition: height 0.3s ease, width 0.3s ease;
+    
+    /* Removed transform-style: preserve-3d */
 }
 
 /* Aspect Ratio Modifiers */
@@ -150,7 +189,8 @@ body::after {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%) translateZ(20px);
+    /* Removed translateZ */
+    transform: translate(-50%, -50%);
     z-index: 20;
     background: rgba(26, 26, 26, 0.6);
     backdrop-filter: blur(10px);
@@ -168,7 +208,8 @@ body::after {
 }
 
 .plus-connector:hover {
-    transform: translate(-50%, -50%) translateZ(20px) scale(1.1);
+    /* Removed translateZ */
+    transform: translate(-50%, -50%) scale(1.1);
 }
 
 /* Color Dot Styles */
@@ -228,8 +269,17 @@ body::after {
 
 /* Loading Animation */
 @keyframes pulse-glow {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.7; transform: scale(1.05); }
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.7;
+        transform: scale(1.05);
+    }
 }
 
 .pulse-glow {
@@ -238,9 +288,17 @@ body::after {
 
 /* Button Haptic Feedback */
 @keyframes button-press {
-    0% { transform: scale(1); }
-    50% { transform: scale(0.95); }
-    100% { transform: scale(1); }
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(0.95);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
 
 .btn-haptic:active {
@@ -346,9 +404,11 @@ body::after {
         height: 65vh;
         max-height: 650px;
     }
+
     #history-drawer {
         width: 100%;
     }
+
     .batch-grid {
         grid-template-columns: repeat(2, 1fr);
     }

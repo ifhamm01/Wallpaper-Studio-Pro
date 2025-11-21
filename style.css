@@ -16,7 +16,7 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 1;
+    z-index: 1; /* Lowest layer */
     pointer-events: none;
     opacity: 0.08;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
@@ -33,7 +33,7 @@ body::after {
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 2;
+    z-index: 2; /* Second lowest layer */
     pointer-events: none;
     opacity: 0.03;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.65' numOctaves='3' seed='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)' opacity='0.5'/%3E%3C/svg%3E");
@@ -89,46 +89,68 @@ body::after {
     pointer-events: none;
 }
 
-/* --- MODIFIED: Navigation Buttons (Large & Static) --- */
+/* --- NAVIGATION ARROWS (Large & Static) --- */
 .group button[onclick*="Slide"] {
-    transform-style: flat !important;
-    will-change: transform, opacity;
-    z-index: 50 !important;
     position: absolute;
     cursor: pointer;
-    pointer-events: auto !important;
     
-    /* Force Visible and Large */
+    /* Clickability Assurance */
+    z-index: 100 !important; 
+    pointer-events: auto !important;
     opacity: 1 !important;
+
+    /* Sizing & Positioning */
     width: 56px !important;
     height: 56px !important;
-    background-color: rgba(0, 0, 0, 0.4) !important;
     border-radius: 50%;
-    border: 1px solid rgba(255,255,255,0.15);
+    
+    /* Premium Glass Look */
+    background-color: rgba(0, 0, 0, 0.4) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(4px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    
+    /* Alignment */
     display: flex;
     align-items: center;
     justify-content: center;
     
-    /* Remove hover scale animation */
-    transform: translateY(-50%) !important;
-    transition: background-color 0.2s ease !important;
+    /* Smooth Transition */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-/* Only change brightness on hover */
+/* HOVER: Glow & Brightness */
 .group button[onclick*="Slide"]:hover {
-    background-color: rgba(255, 255, 255, 0.3) !important;
-    transform: translateY(-50%) !important; /* Ensure it doesn't move */
+    background-color: rgba(255, 255, 255, 0.25) !important;
+    border-color: rgba(255, 255, 255, 0.6);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    transform: scale(1.05); /* Slight growth */
 }
 
+/* ACTIVE: Click press effect */
 .group button[onclick*="Slide"]:active {
-    background-color: rgba(255, 255, 255, 0.5) !important;
+    background-color: rgba(255, 255, 255, 0.4) !important;
+    transform: scale(0.95);
 }
 
-/* Make Icons Bigger */
+/* ICON: Scale & Shadow Animation */
 .group button[onclick*="Slide"] svg {
     width: 32px !important;
     height: 32px !important;
+    stroke-width: 2.5px;
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.group button[onclick*="Slide"]:hover svg {
+    filter: drop-shadow(0 0 6px rgba(255,255,255,0.9)); /* White glow on icon */
+    transform: scale(1.15); /* Icon pops out */
+}
+
+/* --- HIDE ARROWS When Generating --- */
+.split-card-container.generating-active button[onclick*="Slide"] {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: translateY(-50%) scale(0.8) !important;
 }
 
 /* Scrollbar Hide */
@@ -141,10 +163,11 @@ body::after {
     scrollbar-width: none;
 }
 
-/* --- MODIFIED: Main Container (Removed Parallax) --- */
+/* 3D Tilt Container */
 .perspective-container {
-    /* Removed perspective: 1000px; */
+    perspective: 1000px;
     position: relative;
+    z-index: 10; /* Ensure container is above noise */
 }
 
 /* Floating Animation Keyframes */
@@ -161,8 +184,8 @@ body::after {
     overflow: hidden;
     position: relative;
     
-    /* FIX: Ensure card sits above noise (z-index 1 & 2) */
-    z-index: 10; 
+    /* FIX FOR CORRUPTION */
+    z-index: 20; /* Forces card ABOVE the noise texture (z-index 1 & 2) */
     
     border: 2px solid rgba(255, 255, 255, 0.1);
     background: rgba(26, 26, 26, 0.4);
@@ -171,11 +194,9 @@ body::after {
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37),
         inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
         
-    /* Applied Simple Animation */
+    /* Floating Animation */
     animation: float-card 6s ease-in-out infinite;
     transition: height 0.3s ease, width 0.3s ease;
-    
-    /* Removed transform-style: preserve-3d */
 }
 
 /* Aspect Ratio Modifiers */
@@ -189,9 +210,8 @@ body::after {
     position: absolute;
     top: 50%;
     left: 50%;
-    /* Removed translateZ */
-    transform: translate(-50%, -50%);
-    z-index: 20;
+    transform: translate(-50%, -50%); /* Removed translateZ for safer rendering */
+    z-index: 30;
     background: rgba(26, 26, 26, 0.6);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
@@ -208,7 +228,6 @@ body::after {
 }
 
 .plus-connector:hover {
-    /* Removed translateZ */
     transform: translate(-50%, -50%) scale(1.1);
 }
 
@@ -343,26 +362,6 @@ body::after {
     fill: #fbbf24;
 }
 
-/* Batch Generation Grid */
-.batch-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 1rem;
-}
-
-.batch-item {
-    aspect-ratio: 9/16;
-    border-radius: 0.75rem;
-    overflow: hidden;
-    cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.batch-item:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 24px rgba(255, 255, 255, 0.2);
-}
-
 /* Share Menu */
 .share-menu {
     position: absolute;
@@ -465,4 +464,183 @@ body::after {
 /* Smooth Transitions */
 * {
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* =========================================
+   History Catalog Styles (Large Card Update)
+   ========================================= */
+
+/* The Container */
+#history-list {
+    scrollbar-width: none; 
+    -ms-overflow-style: none;
+    padding-bottom: 150px; /* More scrolling space at bottom */
+}
+
+#history-list::-webkit-scrollbar { 
+    display: none; 
+}
+
+/* Card Animation */
+.history-card {
+    opacity: 0;
+    transform: translateY(60px) scale(0.9); /* More dramatic entry */
+    transition: 
+        opacity 0.7s cubic-bezier(0.2, 0.8, 0.2, 1),
+        transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.history-card.reveal {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+/* Card Container */
+.history-card {
+    position: relative;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1.5rem; /* Larger radius */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5); /* Deeper shadow */
+}
+
+/* Image Wrapper */
+.history-card-image-wrapper {
+    position: relative;
+    width: 100%;
+    /* FIX: Maintain aspect ratio but don't exceed 70% of screen height */
+    aspect-ratio: 9/16; 
+    max-height: 70vh; 
+    overflow: hidden;
+    cursor: pointer;
+    background-color: black;
+}
+
+.history-card-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Ensures the whole image is seen within the box */
+    background: #050505; /* Dark background for letterboxing if needed */
+    transition: transform 0.7s ease;
+}
+
+/* Zoom effect on hover */
+.history-card:hover .history-card-img {
+    transform: scale(1.03);
+}
+
+/* Overlay Actions */
+.history-actions-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%);
+    opacity: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 2rem;
+    transition: opacity 0.3s ease;
+}
+
+.history-card:hover .history-actions-overlay {
+    opacity: 1;
+}
+
+/* Action Buttons - Made Larger */
+.history-btn-group {
+    display: flex;
+    gap: 1rem;
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+}
+
+.history-card:hover .history-btn-group {
+    transform: translateY(0);
+}
+
+.catalog-btn {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 1rem; /* Larger buttons */
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.catalog-btn:hover {
+    background: white;
+    color: black;
+    transform: translateY(-2px);
+}
+
+/* Info Section */
+.history-info {
+    padding: 1.5rem;
+    background: #141414;
+    border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.history-title {
+    font-weight: 800;
+    color: #fff;
+    font-size: 1.25rem; /* Larger Text */
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+}
+
+.history-date {
+    font-size: 0.875rem;
+    color: #888;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Favorite Star */
+.history-fav-btn {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    z-index: 10;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(8px);
+    padding: 0.75rem; /* Larger hit area */
+    border-radius: 50%;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.history-card:hover .history-fav-btn,
+.history-fav-btn.active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.history-fav-btn.active {
+    background: rgba(251, 191, 36, 0.2);
+    color: #fbbf24;
+    border-color: rgba(251, 191, 36, 0.4);
+}
+
+/* Animation for revealing empty state */
+.reveal-on-load {
+    transition: opacity 0.5s ease;
+}
+
+/* Ensure tab icons are aligned */
+#history-drawer button i {
+    flex-shrink: 0;
 }

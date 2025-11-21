@@ -14,24 +14,13 @@ const state = {
     advancedMode: false,
     seed: null,
     numSteps: 4,
+    historyFilter: 'all',
     isPromptManuallyEdited: false // Flag to track manual edits
 };
 
 // ============================================================================
 // UTILITY FUNCTIONS
 // ============================================================================
-
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
 
 function isMobileDevice() {
     return window.innerWidth < 768;
@@ -54,12 +43,13 @@ function showToast(message, type = 'info', duration = 3000) {
     };
 
     toast.innerHTML = `
-        <i data-lucide="${iconMap[type]}" class="w-5 h-5"></i>
+        <i data-lucide="${iconMap[type] || 'info'}" class="w-5 h-5"></i>
         <span>${message}</span>
     `;
 
     document.body.appendChild(toast);
-    lucide.createIcons();
+    
+    if (window.lucide) lucide.createIcons();
 
     setTimeout(() => toast.classList.add('show'), 10);
 
@@ -82,7 +72,9 @@ async function copyToClipboard(text) {
 // INITIALIZATION
 // ============================================================================
 window.onload = () => {
-    lucide.createIcons();
+    if (window.lucide) lucide.createIcons();
+    
+    loadPreferences(); // Load prefs before UI init
     initCarousel();
     initWebGL();
     initKeyboardNavigation();
@@ -90,23 +82,28 @@ window.onload = () => {
     renderFavorites();
     updateTime();
 
-    document.getElementById('generate-button').addEventListener('click', handleGenerate);
+    const generateBtn = document.getElementById('generate-button');
+    if (generateBtn) generateBtn.addEventListener('click', handleGenerate);
 
     // Track manual prompt editing
-    document.getElementById('custom-prompt').addEventListener('input', () => {
-        state.isPromptManuallyEdited = true;
-    });
-
-    loadPreferences();
+    const promptInput = document.getElementById('custom-prompt');
+    if (promptInput) {
+        promptInput.addEventListener('input', () => {
+            state.isPromptManuallyEdited = true;
+        });
+    }
 };
 
 function loadPreferences() {
     const saved = localStorage.getItem('wallpaper_preferences');
     if (saved) {
-        const prefs = JSON.parse(saved);
-        state.activeGenreIndex = prefs.genreIndex || 0;
-        state.activeStyleIndex = prefs.styleIndex || 0;
-        updateCarouselUI();
+        try {
+            const prefs = JSON.parse(saved);
+            state.activeGenreIndex = prefs.genreIndex || 0;
+            state.activeStyleIndex = prefs.styleIndex || 0;
+        } catch (e) {
+            console.error("Error loading preferences", e);
+        }
     }
 }
 
@@ -123,6 +120,14 @@ function savePreferences() {
 function initCarousel() {
     const genreTrack = document.getElementById('genre-track');
     const styleTrack = document.getElementById('style-track');
+
+    if (!GENRES || !STYLES) {
+        console.error("Config missing: GENRES or STYLES undefined");
+        return;
+    }
+
+    genreTrack.innerHTML = '';
+    styleTrack.innerHTML = '';
 
     GENRES.forEach(g => {
         const el = document.createElement('div');
@@ -144,10 +149,19 @@ function initCarousel() {
 }
 
 function updateCarouselUI() {
-    document.getElementById('genre-track').style.transform = `translateX(-${state.activeGenreIndex * 100}%)`;
-    document.getElementById('style-track').style.transform = `translateX(-${state.activeStyleIndex * 100}%)`;
-    document.getElementById('genre-label').innerText = GENRES[state.activeGenreIndex].name;
-    document.getElementById('style-label').innerText = STYLES[state.activeStyleIndex].name;
+    if (!GENRES || !STYLES) return;
+
+    const genreTrack = document.getElementById('genre-track');
+    const styleTrack = document.getElementById('style-track');
+
+    if (genreTrack) genreTrack.style.transform = `translateX(-${state.activeGenreIndex * 100}%)`;
+    if (styleTrack) styleTrack.style.transform = `translateX(-${state.activeStyleIndex * 100}%)`;
+    
+    const genreLabel = document.getElementById('genre-label');
+    const styleLabel = document.getElementById('style-label');
+
+    if (genreLabel) genreLabel.innerText = GENRES[state.activeGenreIndex].name;
+    if (styleLabel) styleLabel.innerText = STYLES[state.activeStyleIndex].name;
     
     updateCustomPromptPlaceholder();
     savePreferences();
@@ -165,8 +179,7 @@ function checkPromptConflict() {
         );
 
         if (choice) {
-            // User chose to discard/overwrite.
-            // AUTO-COPY Feature: Save old prompt to clipboard before destroying it
+            // AUTO-COPY Feature
             const oldPrompt = document.getElementById('custom-prompt').value;
             navigator.clipboard.writeText(oldPrompt).then(() => {
                 showToast("Old prompt copied to clipboard", "info");
@@ -174,11 +187,11 @@ function checkPromptConflict() {
 
             state.isPromptManuallyEdited = false;
             document.getElementById('custom-prompt').value = ''; 
-            return true; // Allow change
+            return true; 
         }
-        return false; // Block change
+        return false; 
     }
-    return true; // No conflict
+    return true; 
 }
 
 function nextSlide(type) {
@@ -205,9 +218,11 @@ function prevSlide(type) {
 
 function randomize() {
     state.isPromptManuallyEdited = false; 
-    document.getElementById('custom-prompt').value = '';
+    const promptInput = document.getElementById('custom-prompt');
+    if(promptInput) promptInput.value = '';
     
-    if (!document.getElementById('generation-overlay').classList.contains('hidden')) {
+    const overlay = document.getElementById('generation-overlay');
+    if (overlay && !overlay.classList.contains('hidden')) {
         closeGenerationDisplay();
     }
 
@@ -229,7 +244,8 @@ function initKeyboardNavigation() {
     document.addEventListener('keydown', (e) => {
         if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
 
-        const isGenerationOverlayOpen = !document.getElementById('generation-overlay').classList.contains('hidden');
+        const overlay = document.getElementById('generation-overlay');
+        const isGenerationOverlayOpen = overlay && !overlay.classList.contains('hidden');
 
         switch (e.key) {
             case 'ArrowLeft':
@@ -287,7 +303,8 @@ function initKeyboardNavigation() {
                     closeGenerationDisplay();
                 } else {
                     closeResult();
-                    if (!document.getElementById('history-drawer').classList.contains('translate-x-full')) {
+                    const drawer = document.getElementById('history-drawer');
+                    if (drawer && !drawer.classList.contains('translate-x-full')) {
                         toggleHistory();
                     }
                 }
@@ -301,6 +318,7 @@ function initKeyboardNavigation() {
 // ============================================================================
 function togglePromptEditor() {
     const area = document.getElementById('custom-prompt');
+    if (!area) return;
     area.classList.toggle('hidden');
     
     if (!area.classList.contains('hidden')) {
@@ -310,6 +328,8 @@ function togglePromptEditor() {
 }
 
 function updateCustomPromptPlaceholder() {
+    if (!GENRES || !STYLES) return;
+    
     const genre = GENRES[state.activeGenreIndex].prompt;
     const style = STYLES[state.activeStyleIndex].prompt;
     const color = state.selectedColorBias ? `, ${state.selectedColorBias} color palette` : '';
@@ -317,6 +337,7 @@ function updateCustomPromptPlaceholder() {
     const text = `${genre}, ${style}${color}${customColorText}. 8k resolution, highly detailed.`;
 
     const area = document.getElementById('custom-prompt');
+    if (!area) return;
     
     area.placeholder = text;
 
@@ -327,8 +348,10 @@ function updateCustomPromptPlaceholder() {
 
 function copyPrompt() {
     const area = document.getElementById('custom-prompt');
-    const prompt = area.value || area.placeholder;
-    copyToClipboard(prompt);
+    if (area) {
+        const prompt = area.value || area.placeholder;
+        copyToClipboard(prompt);
+    }
 }
 
 // ============================================================================
@@ -354,11 +377,11 @@ function toggleAspectRatio() {
         container.classList.remove('desktop-mode');
         showToast('Mobile mode (1080x1920)', 'info', 2000);
     }
-    lucide.createIcons();
+    if(window.lucide) lucide.createIcons();
 }
 
 // ============================================================================
-// COLOR BIAS
+// COLOR BIAS & ADVANCED CONTROLS
 // ============================================================================
 function setColorBias(color) {
     state.selectedColorBias = color;
@@ -369,14 +392,13 @@ function setColorBias(color) {
 
 function setCustomColor() {
     const picker = document.getElementById('custom-color-picker');
-    state.customColor = picker.value;
-    showToast(`Custom color: ${picker.value}`, 'info', 2000);
-    updateCustomPromptPlaceholder();
+    if (picker) {
+        state.customColor = picker.value;
+        showToast(`Custom color: ${picker.value}`, 'info', 2000);
+        updateCustomPromptPlaceholder();
+    }
 }
 
-// ============================================================================
-// ADVANCED CONTROLS
-// ============================================================================
 function toggleAdvancedControls() {
     state.advancedMode = !state.advancedMode;
     const panel = document.getElementById('advanced-controls');
@@ -384,8 +406,10 @@ function toggleAdvancedControls() {
 
     const btn = event.currentTarget;
     const icon = btn.querySelector('i');
-    icon.setAttribute('data-lucide', state.advancedMode ? 'chevron-up' : 'chevron-down');
-    lucide.createIcons();
+    if (icon) {
+        icon.setAttribute('data-lucide', state.advancedMode ? 'chevron-up' : 'chevron-down');
+        if(window.lucide) lucide.createIcons();
+    }
 }
 
 function updateSeed(value) {
@@ -399,20 +423,56 @@ function updateSteps(value) {
 
 function randomSeed() {
     const seed = Math.floor(Math.random() * 1000000);
-    document.getElementById('seed-input').value = seed;
+    const seedInput = document.getElementById('seed-input');
+    if(seedInput) seedInput.value = seed;
     state.seed = seed;
     showToast(`Random seed: ${seed}`, 'info', 2000);
 }
 
+
 // ============================================================================
 // HISTORY MANAGEMENT
 // ============================================================================
+
+const historyObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry, index) => {
+        if (entry.isIntersecting) {
+            setTimeout(() => {
+                entry.target.classList.add('reveal');
+            }, index * 50);
+            historyObserver.unobserve(entry.target);
+        }
+    });
+}, {
+    root: document.getElementById('history-drawer'),
+    threshold: 0.1,
+    rootMargin: '50px'
+});
+
+window.setHistoryFilter = function(filter) {
+    state.historyFilter = filter;
+    
+    const tabAll = document.getElementById('tab-all');
+    const tabFav = document.getElementById('tab-favorites');
+    
+    if (filter === 'all') {
+        tabAll.className = "flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-300 flex items-center justify-center gap-2 bg-white text-black shadow-lg";
+        tabFav.className = "flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-300 flex items-center justify-center gap-2 text-gray-400 hover:text-white";
+    } else {
+        tabAll.className = "flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-300 flex items-center justify-center gap-2 text-gray-400 hover:text-white";
+        tabFav.className = "flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-300 flex items-center justify-center gap-2 bg-white text-black shadow-lg";
+    }
+    renderHistory();
+}
+
 function toggleHistory() {
     const drawer = document.getElementById('history-drawer');
     const overlay = document.getElementById('history-overlay');
+    
     if (drawer.classList.contains('translate-x-full')) {
         drawer.classList.remove('translate-x-full');
         overlay.classList.remove('hidden');
+        renderHistory(); 
     } else {
         drawer.classList.add('translate-x-full');
         overlay.classList.add('hidden');
@@ -433,58 +493,102 @@ function saveToHistory(url, genreName, styleName, prompt, seed) {
     history.unshift(newItem);
     if (history.length > APP_CONFIG.MAX_HISTORY_ITEMS) history.pop();
     localStorage.setItem('wallpaper_history', JSON.stringify(history));
-    renderHistory();
-}
-
-function renderHistory() {
-    const history = JSON.parse(localStorage.getItem('wallpaper_history') || '[]');
-    const list = document.getElementById('history-list');
-    list.innerHTML = '';
-
-    if (history.length === 0) {
-        list.innerHTML = '<p class="text-gray-500 text-center mt-10">No wallpapers yet.</p>';
-        return;
-    }
-
-    history.forEach((item, index) => {
-        const div = document.createElement('div');
-        div.className = 'history-item bg-white/5 p-2 rounded-lg flex gap-3 items-center hover:bg-white/10 transition';
-        div.innerHTML = `
-            <img src="${item.url}" class="w-12 h-12 rounded object-cover bg-black" loading="lazy" alt="Wallpaper thumbnail" />
-            <div class="flex-1 min-w-0">
-                <p class="text-sm font-bold text-white truncate">${item.genre} + ${item.style}</p>
-                <p class="text-xs text-gray-400">${item.date}</p>
-            </div>
-            <button onclick="toggleFavorite('${item.url}')" class="favorite-star ${state.favorites.includes(item.url) ? 'active' : ''}" title="Add to favorites">
-                <i data-lucide="star" class="w-4 h-4"></i>
-            </button>
-            <button onclick="deleteHistoryItem(${index})" class="p-1 hover:bg-red-500/20 rounded" title="Delete">
-                <i data-lucide="trash-2" class="w-4 h-4 text-red-400"></i>
-            </button>
-            <button onclick="showResult('${item.url}', ${item.seed || 'null'})" class="p-1 hover:bg-white/20 rounded" title="View">
-                <i data-lucide="eye" class="w-4 h-4"></i>
-            </button>
-        `;
-        list.appendChild(div);
-    });
-
-    lucide.createIcons();
-}
-
-function deleteHistoryItem(index) {
-    const history = JSON.parse(localStorage.getItem('wallpaper_history') || '[]');
-    history.splice(index, 1);
-    localStorage.setItem('wallpaper_history', JSON.stringify(history));
-    renderHistory();
-    showToast('Deleted from history', 'success', 2000);
 }
 
 function clearHistory() {
-    if (confirm('Clear all history? This cannot be undone.')) {
-        localStorage.setItem('wallpaper_history', '[]');
+    if(confirm('Are you sure you want to clear your generation history? Favorites will not be deleted.')) {
+        localStorage.removeItem('wallpaper_history');
         renderHistory();
         showToast('History cleared', 'success');
     }
+}
+
+function renderHistory() {
+    let history = JSON.parse(localStorage.getItem('wallpaper_history') || '[]');
+    const list = document.getElementById('history-list');
+    
+    historyObserver.disconnect();
+    list.innerHTML = '';
+
+    if (state.historyFilter === 'favorites') {
+        history = history.filter(item => state.favorites.includes(item.url));
+    }
+
+    if (history.length === 0) {
+        const icon = state.historyFilter === 'favorites' ? 'star-off' : 'image';
+        const text = state.historyFilter === 'favorites' ? 'No favorites yet.' : 'No wallpapers generated yet.';
+        
+        list.innerHTML = `
+            <div class="flex flex-col items-center justify-center h-64 text-gray-500 opacity-0 reveal-on-load">
+                <i data-lucide="${icon}" class="w-12 h-12 mb-4 opacity-50"></i>
+                <p>${text}</p>
+            </div>
+        `;
+        setTimeout(() => {
+            const div = list.querySelector('div');
+            if(div) div.style.opacity = '1';
+        }, 100);
+        if(window.lucide) lucide.createIcons();
+        return;
+    }
+
+    history.forEach((item) => {
+        const isFav = state.favorites.includes(item.url);
+        
+        const card = document.createElement('div');
+        card.className = 'history-card';
+        
+        card.innerHTML = `
+            <div class="history-card-image-wrapper" onclick="showResult('${item.url}', ${item.seed || 'null'})">
+                <img src="${item.url}" class="history-card-img" loading="lazy" alt="AI Wallpaper">
+                
+                <button onclick="event.stopPropagation(); toggleFavorite('${item.url}')" 
+                        class="history-fav-btn ${isFav ? 'active' : ''}" 
+                        title="Toggle Favorite">
+                    <i data-lucide="star" class="w-4 h-4 ${isFav ? 'fill-current' : ''}"></i>
+                </button>
+
+                <div class="history-actions-overlay">
+                    <div class="history-btn-group">
+                        <button onclick="event.stopPropagation(); showResult('${item.url}', ${item.seed || 'null'})" 
+                                class="catalog-btn">
+                            <i data-lucide="eye" class="w-4 h-4 mr-2"></i> View
+                        </button>
+                        <button onclick="event.stopPropagation(); downloadImageDirect('${item.url}')" 
+                                class="catalog-btn">
+                            <i data-lucide="download" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="history-info">
+                <h3 class="history-title">${item.genre} <span class="text-gray-500 font-normal">+</span> ${item.style}</h3>
+                <div class="history-date">
+                    <i data-lucide="clock" class="w-3 h-3"></i>
+                    <span>${item.date.split(',')[0]}</span>
+                    <span class="ml-auto text-xs text-gray-600 font-mono">SEED: ${item.seed || 'N/A'}</span>
+                </div>
+                <button onclick="deleteHistoryItem('${item.timestamp}')" 
+                        class="mt-3 w-full flex items-center justify-center gap-2 text-xs text-red-400 hover:text-red-300 hover:bg-red-900/20 py-2 rounded transition">
+                    <i data-lucide="trash-2" class="w-3 h-3"></i> Delete
+                </button>
+            </div>
+        `;
+
+        list.appendChild(card);
+        historyObserver.observe(card);
+    });
+
+    if(window.lucide) lucide.createIcons();
+}
+
+function deleteHistoryItem(timestamp) {
+    let history = JSON.parse(localStorage.getItem('wallpaper_history') || '[]');
+    history = history.filter(item => item.timestamp !== Number(timestamp));
+    localStorage.setItem('wallpaper_history', JSON.stringify(history));
+    renderHistory();
+    showToast('Deleted from history', 'success', 2000);
 }
 
 // ============================================================================
@@ -562,14 +666,14 @@ async function handleGenerate() {
     const resultImage = document.getElementById('generation-result-image');
     const actions = document.getElementById('generation-actions');
 
+    document.getElementById('main-card').classList.add('generating-active');
+
     overlay.classList.remove('hidden');
     canvas.classList.remove('hidden');
     statusDiv.classList.remove('hidden');
     resultImage.classList.add('hidden');
     actions.classList.add('hidden');
 
-    // *** FIX: Reset Opacity explicitly here ***
-    // This ensures animation is visible even if triggering consecutively
     canvas.style.opacity = '1';
     statusDiv.style.opacity = '1';
 
@@ -579,9 +683,13 @@ async function handleGenerate() {
 
     try {
         let data = null;
+        // Ensure API URL is valid
+        const apiUrl = (API_CONFIG.BASE_URL.endsWith('/') ? API_CONFIG.BASE_URL.slice(0, -1) : API_CONFIG.BASE_URL) 
+                       + API_CONFIG.GENERATION_ENDPOINT;
+
         for (let i = 0; i < API_CONFIG.MAX_RETRIES; i++) {
             try {
-                const response = await fetch(API_CONFIG.BASE_URL + API_CONFIG.GENERATION_ENDPOINT, {
+                const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -607,11 +715,7 @@ async function handleGenerate() {
         if (data && data.output) {
             stopGenerationAnimation();
 
-            const canvas = document.getElementById('webgl-generation-canvas');
-            const statusDiv = document.getElementById('generation-status');
-            const resultImage = document.getElementById('generation-result-image');
-            const actions = document.getElementById('generation-actions');
-
+            // Crossfade animation from WebGL to Image
             canvas.style.transition = 'opacity 0.5s ease';
             statusDiv.style.transition = 'opacity 0.5s ease';
             canvas.style.opacity = '0';
@@ -629,7 +733,7 @@ async function handleGenerate() {
                 setTimeout(() => {
                     resultImage.style.opacity = '1';
                     actions.classList.remove('hidden');
-                    lucide.createIcons();
+                    if(window.lucide) lucide.createIcons();
                 }, 50);
             }, 500);
 
@@ -639,14 +743,16 @@ async function handleGenerate() {
             saveToHistory(data.output, genre.name, style.name, finalPrompt, seed);
             showToast('Wallpaper created successfully!', 'success');
         } else {
-            throw new Error('No output');
+            throw new Error('No output data received');
         }
 
     } catch (error) {
         console.error(error);
         stopGenerationAnimation();
         closeGenerationDisplay();
-        showToast('Generation failed. Please try again.', 'error');
+        // More descriptive error if it's a fetch error (often CORS or wrong URL)
+        const msg = error.message.includes('Failed to fetch') ? 'Connection failed. Check API URL.' : 'Generation failed.';
+        showToast(msg, 'error');
     }
 }
 
@@ -678,10 +784,12 @@ function closeResult() {
 }
 
 // ============================================================================
-// WEBGL BACKGROUND
+// WEBGL BACKGROUND & ANIMATION
 // ============================================================================
 function initWebGL() {
     const canvas = document.getElementById('webgl-canvas');
+    if (!canvas) return;
+    
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x050505);
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -725,7 +833,6 @@ function initWebGL() {
 // ============================================================================
 // SHARE FUNCTIONALITY
 // ============================================================================
-
 function toggleShareMenu() {
     const menu = document.getElementById('share-menu');
     const nativeBtn = document.getElementById('native-share-btn');
@@ -755,7 +862,7 @@ async function shareImage(platform) {
 
     const shareOptions = {
         title: 'Wallpaper Studio Pro',
-        text: 'Check out this awesome AI-generated wallpaper I made with Wallpaper Studio Pro! #NothingCommunity',
+        text: 'Check out this awesome AI-generated wallpaper! #WallpaperStudioPro',
         url: url 
     };
 
@@ -765,29 +872,20 @@ async function shareImage(platform) {
                 try {
                     await navigator.share(shareOptions);
                 } catch (error) {
-                    if (error.name !== 'AbortError') {
-                        showToast('Share failed.', 'error');
-                    }
+                    if (error.name !== 'AbortError') showToast('Share failed.', 'error');
                 }
             }
             break;
-
         case 'download':
             await downloadImageDirect(url);
             break;
-
         case 'copy':
             copyToClipboard(url);
-            showToast('Image link copied to clipboard!', 'success');
+            showToast('Image link copied!', 'success');
             break;
-
         case 'twitter':
             const twitterText = encodeURIComponent(shareOptions.text + ' ' + shareOptions.url);
             window.open(`https://twitter.com/intent/tweet?text=${twitterText}`, '_blank');
-            break;
-
-        case 'facebook':
-            window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareOptions.url)}`, '_blank');
             break;
     }
 
@@ -810,13 +908,13 @@ async function downloadImageDirect(url) {
         document.body.removeChild(link);
 
         setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
-
         showToast('Download started', 'success');
     } catch (error) {
         console.error('Download failed:', error);
         showToast('Download failed', 'error');
     }
 }
+
 // ============================================================================
 // WEBGL GENERATION ANIMATION
 // ============================================================================
@@ -844,11 +942,9 @@ function initGenerationAnimation() {
     const positions = new Float32Array(pixelCount * 3);
     const sizes = new Float32Array(pixelCount);
     const velocities = new Float32Array(pixelCount * 3);
-    const targetPositions = new Float32Array(pixelCount * 3);
 
     for (let i = 0; i < pixelCount; i++) {
         const i3 = i * 3;
-
         const radius = 40 + Math.random() * 20;
         const theta = Math.random() * Math.PI * 2;
         const phi = Math.random() * Math.PI;
@@ -856,14 +952,6 @@ function initGenerationAnimation() {
         positions[i3] = radius * Math.sin(phi) * Math.cos(theta);
         positions[i3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
         positions[i3 + 2] = -radius; 
-
-        const gridSize = Math.ceil(Math.sqrt(pixelCount));
-        const x = (i % gridSize) - gridSize / 2;
-        const y = Math.floor(i / gridSize) - gridSize / 2;
-
-        targetPositions[i3] = x * 0.08; 
-        targetPositions[i3 + 1] = y * 0.08;
-        targetPositions[i3 + 2] = 0;
 
         velocities[i3] = (Math.random() - 0.5) * 0.05;
         velocities[i3 + 1] = (Math.random() - 0.5) * 0.05;
@@ -886,16 +974,7 @@ function initGenerationAnimation() {
 
     const pixelSystem = new THREE.Points(pixelGeometry, pixelMaterial);
     generationScene.add(pixelSystem);
-
-    const centerGeometry = new THREE.SphereGeometry(0.3, 32, 32);
-    const centerMaterial = new THREE.MeshBasicMaterial({
-        color: 0xffffff,
-        transparent: true,
-        opacity: 0.2
-    });
-    const centerSphere = new THREE.Mesh(centerGeometry, centerMaterial);
-    generationScene.add(centerSphere);
-
+    
     const ambientLight = new THREE.AmbientLight(0x606060);
     generationScene.add(ambientLight);
 
@@ -903,42 +982,25 @@ function initGenerationAnimation() {
 
     function animate() {
         generationAnimationId = requestAnimationFrame(animate);
-
         const elapsed = (Date.now() - startTime) * 0.001;
         const positions = pixelGeometry.attributes.position.array;
 
         for (let i = 0; i < pixelCount; i++) {
             const i3 = i * 3;
+            // Swirl effect
+            positions[i3] += velocities[i3] * 2 + Math.sin(elapsed * 0.5 + i * 0.1) * 0.02;
+            positions[i3 + 1] += velocities[i3 + 1] * 2 + Math.cos(elapsed * 0.5 + i * 0.1) * 0.02;
+            positions[i3 + 2] += 0.15; // Move forward
 
-            positions[i3] += velocities[i3] * 2;
-            positions[i3 + 1] += velocities[i3 + 1] * 2;
-            positions[i3 + 2] += 0.15; 
-
-            positions[i3] += Math.sin(elapsed * 0.5 + i * 0.1) * 0.02;
-            positions[i3 + 1] += Math.cos(elapsed * 0.5 + i * 0.1) * 0.02;
-
+            // Reset if too close
             if (positions[i3 + 2] > 5) {
                 positions[i3 + 2] = -50 - Math.random() * 10;
                 positions[i3] = (Math.random() - 0.5) * 20;
                 positions[i3 + 1] = (Math.random() - 0.5) * 20;
             }
-
-            const depth = positions[i3 + 2];
-            const normalizedDepth = Math.max(0, Math.min(1, (-depth + 5) / 50));
-            const baseSize = 0.05;
-            const blurSize = 0.35;
-            pixelGeometry.attributes.size.array[i] = baseSize + normalizedDepth * blurSize;
         }
-
         pixelGeometry.attributes.position.needsUpdate = true;
-        pixelGeometry.attributes.size.needsUpdate = true;
-
         pixelSystem.rotation.y = elapsed * 0.03;
-
-        const pulse = 1 + Math.sin(elapsed * 3) * 0.25;
-        centerSphere.scale.set(pulse, pulse, pulse);
-        centerSphere.material.opacity = 0.15 + Math.sin(elapsed * 3) * 0.08;
-
         generationRenderer.render(generationScene, generationCamera);
     }
 
@@ -961,15 +1023,17 @@ function stopGenerationAnimation() {
 function closeGenerationDisplay() {
     stopGenerationAnimation();
     const overlay = document.getElementById('generation-overlay');
-    overlay.classList.add('hidden');
+    if(overlay) overlay.classList.add('hidden');
 
     const canvas = document.getElementById('webgl-generation-canvas');
     const statusDiv = document.getElementById('generation-status');
     const resultImage = document.getElementById('generation-result-image');
     
-    canvas.style.opacity = '1';
-    statusDiv.style.opacity = '1';
-    resultImage.src = '';
+    document.getElementById('main-card').classList.remove('generating-active');
+
+    if(canvas) canvas.style.opacity = '1';
+    if(statusDiv) statusDiv.style.opacity = '1';
+    if(resultImage) resultImage.src = '';
 }
 
 function viewFullResult() {
@@ -1020,16 +1084,3 @@ window.downloadFromModal = async function () {
         await downloadImageDirect(url);
     }
 };
-
-// ============================================================================
-// INITIALIZATION
-// ============================================================================
-document.addEventListener('DOMContentLoaded', () => {
-    if (document.readyState === 'complete') return;
-    initCarousel();
-    initWebGL();
-    renderHistory();
-    updateCustomPromptPlaceholder();
-    initKeyboardNavigation();
-    lucide.createIcons();
-});

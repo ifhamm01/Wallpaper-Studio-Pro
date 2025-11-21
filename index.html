@@ -266,23 +266,44 @@
 
     <!-- History Drawer -->
     <div id="history-drawer"
-        class="fixed top-0 right-0 h-full w-80 bg-[#121212]/90 backdrop-blur-xl border-l border-white/10 z-40 transform translate-x-full transition-transform duration-300 shadow-2xl overflow-hidden flex flex-col"
+        class="fixed top-0 right-0 h-full w-full md:w-1/2 bg-[#0a0a0a]/95 backdrop-blur-2xl border-l border-white/10 z-50 transform translate-x-full transition-transform duration-500 cubic-bezier(0.32, 0.72, 0, 1) shadow-2xl overflow-hidden flex flex-col"
         role="dialog" aria-label="History drawer">
-        <div class="p-4 border-b border-white/10 flex justify-between items-center">
-            <h2 class="font-bold text-lg">History</h2>
-            <div class="flex gap-2">
-                <button onclick="clearHistory()" class="btn-haptic text-xs text-red-400 hover:text-red-300"
-                    aria-label="Clear all history">
-                    Clear All
+        
+        <!-- Header -->
+        <div class="p-6 pb-2 border-b border-white/10 bg-black/20 z-10">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h2 class="font-bold text-2xl text-white tracking-tight">Collection</h2>
+                    <p class="text-sm text-gray-400 mt-0.5">Your generated masterpieces</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="clearHistory()" class="btn-haptic p-3 text-red-400 hover:bg-red-500/10 rounded-xl transition"
+                        title="Clear all history">
+                        <i data-lucide="trash-2" class="w-5 h-5"></i>
+                    </button>
+                    <button onclick="toggleHistory()" class="btn-haptic p-3 hover:bg-white/10 rounded-full transition"
+                        title="Close history">
+                        <i data-lucide="x" class="w-6 h-6 text-white"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- NEW: Filter Tabs -->
+            <div class="flex p-1 bg-white/5 rounded-xl border border-white/5 backdrop-blur-md">
+                <button onclick="setHistoryFilter('all')" id="tab-all" 
+                    class="flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-300 flex items-center justify-center gap-2 bg-white text-black shadow-lg">
+                    <i data-lucide="grid" class="w-4 h-4"></i> All
                 </button>
-                <button onclick="toggleHistory()" class="btn-haptic p-1 hover:bg-white/10 rounded-full"
-                    aria-label="Close history">
-                    <i data-lucide="x" class="w-5 h-5"></i>
+                <button onclick="setHistoryFilter('favorites')" id="tab-favorites" 
+                    class="flex-1 py-2.5 text-sm font-bold rounded-lg transition-all duration-300 flex items-center justify-center gap-2 text-gray-400 hover:text-white">
+                    <i data-lucide="star" class="w-4 h-4"></i> Favorites
                 </button>
             </div>
         </div>
-        <div id="history-list" class="flex-1 overflow-y-auto p-4 space-y-4">
-            <p class="text-gray-500 text-center mt-10">No wallpapers yet.</p>
+        
+        <!-- List Container -->
+        <div id="history-list" class="flex-1 overflow-y-auto p-6 space-y-8 scroll-smooth">
+            <p class="text-gray-500 text-center mt-20">No wallpapers yet.</p>
         </div>
     </div>
 

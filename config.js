@@ -1,3 +1,4 @@
+
 export const GENRES = [
     {
         id: 'cyberpunk',
@@ -70,6 +71,36 @@ export const GENRES = [
         name: 'Golden Hour City',
         prompt: 'urban skyline at golden hour, rich warm sunlight, cinematic lens flares, calm atmospheric cityscape',
         image: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=800&q=80'
+    },
+    {
+        id: 'sky',
+        name: 'Sky & Clouds',
+        prompt: 'majestic rolling clouds, vibrant sunrise or sunset, expansive celestial atmosphere, dreamy skyscape',
+        image: 'https://images.unsplash.com/photo-1501630834273-4b5604d2ee31?w=800&q=80'
+    },
+    {
+        id: 'terrain',
+        name: 'Rough Terrain',
+        prompt: 'rocky canyon landscapes, rugged cliffs, raw geological textures, desert badlands, earthy tones',
+        image: 'https://images.unsplash.com/photo-1546514355-7fdc90ccbd03?w=800&q=80'
+    },
+    {
+        id: 'stilllife',
+        name: 'Still Life',
+        prompt: 'classic still life composition, arranged fruit and objects, dramatic chiaroscuro lighting, fine art detail',
+        image: 'https://images.unsplash.com/photo-1588263823647-ce3546d42bfe?w=800&q=80'
+    },
+    {
+        id: 'iridescence',
+        name: 'Iridescence',
+        prompt: 'holographic iridescent textures, shimmering pearl colors, liquid metal reflections, prismatic light diffraction',
+        image: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=800&q=80'
+    },
+    {
+        id: 'flora',
+        name: 'Lush Flora',
+        prompt: 'exotic botanical garden, intricate leaf patterns, vibrant blooming flowers, macro nature details',
+        image: 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=800&q=80'
     }
 ];
 
@@ -157,8 +188,39 @@ export const STYLES = [
         name: 'Low Poly',
         prompt: 'low-poly 3D render, faceted geometric forms, soft pastel palette, clean minimalist scenery',
         image: 'https://images.unsplash.com/photo-1643143596361-a39511490214'
+    },
+    {
+        id: 'bwphoto',
+        name: 'B&W Photo',
+        prompt: 'classic black and white photography, high contrast monochrome, grainy film texture, timeless vintage look',
+        image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&q=80'
+    },
+    {
+        id: 'classicpaint',
+        name: 'Classic Painting',
+        prompt: 'traditional fine art painting, visible brushwork, acrylic or gouache texture, artistic composition',
+        image: 'https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?w=800&q=80'
+    },
+    {
+        id: 'graphic',
+        name: 'Graphic Design',
+        prompt: 'bold graphic design style, vector art aesthetics, strong typography elements, flat distinct shapes',
+        image: 'https://images.unsplash.com/photo-1626785774573-4b799314346d?w=800&q=80'
+    },
+    {
+        id: 'ink',
+        name: 'Ink Wash',
+        prompt: 'traditional ink wash painting, sumi-e style, monochromatic flowing ink, minimalist brush strokes',
+        image: 'https://images.unsplash.com/photo-1515405295579-ba7b45403062?w=800&q=80'
+    },
+    {
+        id: 'modernist',
+        name: 'Modernist',
+        prompt: 'mid-century modernist art, Bauhaus influence, geometric abstraction, primary colors, clean structure',
+        image: 'https://images.unsplash.com/photo-1554147090-e1221a04a025?w=800&q=80'
     }
 ];
+
 export const COLOR_BIASES = [
     { id: null, name: 'None', color: 'bg-gray-600', border: 'border-white/30' },
     { id: 'red', name: 'Red', color: 'bg-red-600', border: '' },
@@ -194,4 +256,5 @@ export const APP_CONFIG = {
     WEBGL_PARTICLE_COUNT: 600,
     WEBGL_PARTICLE_COUNT_MOBILE: 300
 };
+
 

@@ -1,8 +1,10 @@
+// --- START OF FILE app.js ---
+
 // Wallpaper Studio Pro - Main Application
-import { GENRES, STYLES, PROMPT_TEMPLATES, API_CONFIG, APP_CONFIG } from './config.js';
+import { GENRES, STYLES, API_CONFIG, APP_CONFIG } from './config.js';
 
 // ============================================================================
-// STATE MANAGEMENT
+// STATE MANAGEMENT & GLOBALS
 // ============================================================================
 const state = {
     activeGenreIndex: 0,
@@ -15,8 +17,12 @@ const state = {
     seed: null,
     numSteps: 4,
     historyFilter: 'all',
-    isPromptManuallyEdited: false // Flag to track manual edits
+    isPromptManuallyEdited: false 
 };
+
+// Global WebGL Variables for Dynamic Color (Feature 3C)
+let targetColor = new THREE.Color(0x444444); // Default Grey
+let particleMaterial = null;
 
 // ============================================================================
 // UTILITY FUNCTIONS
@@ -74,9 +80,13 @@ async function copyToClipboard(text) {
 window.onload = () => {
     if (window.lucide) lucide.createIcons();
     
-    loadPreferences(); // Load prefs before UI init
-    initCarousel();
-    initWebGL();
+    loadPreferences(); 
+    
+    initCarousel();      // Setup HTML
+    initSwipeGestures(); // 1B: Mobile Swipe
+    initParallax();      // 3A: Parallax Tilt
+    initWebGL();         // 1C & 3C: WebGL with Fallback & Color
+    
     initKeyboardNavigation();
     renderHistory();
     renderFavorites();
@@ -92,6 +102,9 @@ window.onload = () => {
             state.isPromptManuallyEdited = true;
         });
     }
+
+    // Trigger initial UI state
+    updateCarouselUI();
 };
 
 function loadPreferences() {
@@ -115,37 +128,31 @@ function savePreferences() {
 }
 
 // ============================================================================
-// CAROUSEL LOGIC
+// CAROUSEL LOGIC (Modified for 3B & 3C)
 // ============================================================================
 function initCarousel() {
     const genreTrack = document.getElementById('genre-track');
     const styleTrack = document.getElementById('style-track');
 
     if (!GENRES || !STYLES) {
-        console.error("Config missing: GENRES or STYLES undefined");
+        console.error("Config missing");
         return;
     }
 
-    genreTrack.innerHTML = '';
-    styleTrack.innerHTML = '';
+    // Helper to build slides
+    const buildSlides = (items, track) => {
+        track.innerHTML = '';
+        items.forEach((item) => {
+            const el = document.createElement('div');
+            el.className = 'carousel-item'; // Class used for 3B transitions
+            el.style.backgroundImage = `url('${item.image}')`;
+            el.innerHTML = `<div class="w-full h-full carousel-overlay"></div>`;
+            track.appendChild(el);
+        });
+    };
 
-    GENRES.forEach(g => {
-        const el = document.createElement('div');
-        el.className = 'carousel-item';
-        el.style.backgroundImage = `url('${g.image}')`;
-        el.innerHTML = `<div class="w-full h-full carousel-overlay"></div>`;
-        genreTrack.appendChild(el);
-    });
-
-    STYLES.forEach(s => {
-        const el = document.createElement('div');
-        el.className = 'carousel-item';
-        el.style.backgroundImage = `url('${s.image}')`;
-        el.innerHTML = `<div class="w-full h-full carousel-overlay"></div>`;
-        styleTrack.appendChild(el);
-    });
-
-    updateCarouselUI();
+    buildSlides(GENRES, genreTrack);
+    buildSlides(STYLES, styleTrack);
 }
 
 function updateCarouselUI() {
@@ -154,21 +161,107 @@ function updateCarouselUI() {
     const genreTrack = document.getElementById('genre-track');
     const styleTrack = document.getElementById('style-track');
 
+    // Move Tracks
     if (genreTrack) genreTrack.style.transform = `translateX(-${state.activeGenreIndex * 100}%)`;
     if (styleTrack) styleTrack.style.transform = `translateX(-${state.activeStyleIndex * 100}%)`;
+
+    // 3B: Toggle Active Classes for CSS Scaling Effect
+    if (genreTrack) {
+        Array.from(genreTrack.children).forEach((child, index) => {
+            if (index === state.activeGenreIndex) child.classList.add('is-active');
+            else child.classList.remove('is-active');
+        });
+    }
+
+    if (styleTrack) {
+        Array.from(styleTrack.children).forEach((child, index) => {
+            if (index === state.activeStyleIndex) child.classList.add('is-active');
+            else child.classList.remove('is-active');
+        });
+    }
     
+    // Update Labels
     const genreLabel = document.getElementById('genre-label');
     const styleLabel = document.getElementById('style-label');
-
     if (genreLabel) genreLabel.innerText = GENRES[state.activeGenreIndex].name;
     if (styleLabel) styleLabel.innerText = STYLES[state.activeStyleIndex].name;
+
+    // 3C: Set Dynamic WebGL Color based on Genre
+    // Falls back to grey if config doesn't have color
+    const newColorHex = GENRES[state.activeGenreIndex].color || 0x444444;
+    targetColor.setHex(newColorHex);
     
     updateCustomPromptPlaceholder();
     savePreferences();
 }
 
 // ============================================================================
-// PROMPT PROTECTION LOGIC
+// 1B. MOBILE SWIPE GESTURES
+// ============================================================================
+function initSwipeGestures() {
+    const setupSwipe = (elementId, type) => {
+        const el = document.getElementById(elementId);
+        if (!el) return;
+
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        el.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+
+        el.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, { passive: true });
+
+        const handleSwipe = () => {
+            const threshold = 50; // Minimum swipe distance
+            if (touchEndX < touchStartX - threshold) {
+                nextSlide(type); // Swipe Left -> Next
+            }
+            if (touchEndX > touchStartX + threshold) {
+                prevSlide(type); // Swipe Right -> Prev
+            }
+        };
+    };
+
+    setupSwipe('genre-track', 'genre');
+    setupSwipe('style-track', 'style');
+}
+
+// ============================================================================
+// 3A. PARALLAX TILT EFFECT
+// ============================================================================
+function initParallax() {
+    const container = document.getElementById('tilt-wrapper');
+    const card = document.getElementById('main-card');
+    
+    if (isMobileDevice() || !container || !card) return;
+
+    // Mouse Move
+    document.addEventListener('mousemove', (e) => {
+        const { clientX, clientY } = e;
+        const { innerWidth, innerHeight } = window;
+
+        // Calculate rotation (-1 to 1 range)
+        const xPos = (clientX / innerWidth - 0.5) * 2; 
+        const yPos = (clientY / innerHeight - 0.5) * 2;
+
+        const tiltX = yPos * -10; // Invert Y
+        const tiltY = xPos * 10;
+
+        container.style.transform = `rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+    });
+
+    // Optional: Reset on mouse leave
+    document.addEventListener('mouseleave', () => {
+        container.style.transform = `rotateX(0deg) rotateY(0deg)`;
+    });
+}
+
+// ============================================================================
+// CAROUSEL NAVIGATION & PROMPT PROTECTION
 // ============================================================================
 function checkPromptConflict() {
     if (state.isPromptManuallyEdited) {
@@ -314,7 +407,7 @@ function initKeyboardNavigation() {
 }
 
 // ============================================================================
-// PROMPT EDITOR
+// UI TOGGLES (Prompt, Aspect, Advanced)
 // ============================================================================
 function togglePromptEditor() {
     const area = document.getElementById('custom-prompt');
@@ -354,9 +447,6 @@ function copyPrompt() {
     }
 }
 
-// ============================================================================
-// ASPECT RATIO TOGGLE
-// ============================================================================
 function toggleAspectRatio() {
     state.isDesktopMode = !state.isDesktopMode;
     const btn = document.getElementById('aspect-btn');
@@ -380,9 +470,6 @@ function toggleAspectRatio() {
     if(window.lucide) lucide.createIcons();
 }
 
-// ============================================================================
-// COLOR BIAS & ADVANCED CONTROLS
-// ============================================================================
 function setColorBias(color) {
     state.selectedColorBias = color;
     document.querySelectorAll('.color-dot').forEach(dot => dot.classList.remove('selected'));
@@ -429,9 +516,8 @@ function randomSeed() {
     showToast(`Random seed: ${seed}`, 'info', 2000);
 }
 
-
 // ============================================================================
-// HISTORY MANAGEMENT
+// HISTORY & FAVORITES MANAGEMENT
 // ============================================================================
 
 const historyObserver = new IntersectionObserver((entries) => {
@@ -503,6 +589,7 @@ function clearHistory() {
     }
 }
 
+// Updated renderHistory for 2B (Remix Button)
 function renderHistory() {
     let history = JSON.parse(localStorage.getItem('wallpaper_history') || '[]');
     const list = document.getElementById('history-list');
@@ -550,6 +637,11 @@ function renderHistory() {
 
                 <div class="history-actions-overlay">
                     <div class="history-btn-group">
+                        <button onclick="event.stopPropagation(); remixImage('${item.timestamp}')" 
+                                class="catalog-btn bg-purple-500/20 hover:bg-purple-500 text-white border-purple-500/50"
+                                title="Remix this style">
+                            <i data-lucide="shuffle" class="w-4 h-4"></i>
+                        </button>
                         <button onclick="event.stopPropagation(); showResult('${item.url}', ${item.seed || 'null'})" 
                                 class="catalog-btn">
                             <i data-lucide="eye" class="w-4 h-4 mr-2"></i> View
@@ -591,9 +683,6 @@ function deleteHistoryItem(timestamp) {
     showToast('Deleted from history', 'success', 2000);
 }
 
-// ============================================================================
-// FAVORITES MANAGEMENT
-// ============================================================================
 function toggleFavorite(url) {
     const index = state.favorites.indexOf(url);
     if (index > -1) {
@@ -618,7 +707,45 @@ function renderFavorites() {
 }
 
 // ============================================================================
-// LOCK SCREEN PREVIEW
+// 2B. REMIX LOGIC
+// ============================================================================
+window.remixImage = function(timestamp) {
+    const history = JSON.parse(localStorage.getItem('wallpaper_history') || '[]');
+    // Find item by timestamp (more unique than URL) or URL
+    const item = history.find(i => i.timestamp === Number(timestamp) || i.url === timestamp);
+    
+    if (!item) {
+        showToast("Could not find image details", "error");
+        return;
+    }
+
+    // 1. Try to match Genre
+    const genreIndex = GENRES.findIndex(g => g.name === item.genre);
+    if (genreIndex !== -1) state.activeGenreIndex = genreIndex;
+
+    // 2. Try to match Style
+    const styleIndex = STYLES.findIndex(s => s.name === item.style);
+    if (styleIndex !== -1) state.activeStyleIndex = styleIndex;
+
+    // 3. Set Seed
+    if (item.seed) {
+        state.seed = item.seed;
+        const seedInput = document.getElementById('seed-input');
+        if(seedInput) seedInput.value = item.seed;
+    }
+
+    // 4. Update UI
+    updateCarouselUI();
+    toggleHistory(); // Close drawer
+    
+    showToast("Settings restored! Ready to Remix.", "success");
+    
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+// ============================================================================
+// LOCK SCREEN & MODALS
 // ============================================================================
 function toggleLockScreen() {
     const overlay = document.getElementById('lock-screen-overlay');
@@ -750,7 +877,6 @@ async function handleGenerate() {
         console.error(error);
         stopGenerationAnimation();
         closeGenerationDisplay();
-        // More descriptive error if it's a fetch error (often CORS or wrong URL)
         const msg = error.message.includes('Failed to fetch') ? 'Connection failed. Check API URL.' : 'Generation failed.';
         showToast(msg, 'error');
     }
@@ -784,50 +910,81 @@ function closeResult() {
 }
 
 // ============================================================================
-// WEBGL BACKGROUND & ANIMATION
+// 1C & 3C. WEBGL BACKGROUND (Updated with Fallback & Color)
 // ============================================================================
 function initWebGL() {
     const canvas = document.getElementById('webgl-canvas');
     if (!canvas) return;
+
+    // 1C: Fallback Check
+    if (!window.WebGLRenderingContext) {
+        enableFallbackMode();
+        return;
+    }
     
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x050505);
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    camera.position.z = 5;
-
-    const particleCount = isMobileDevice() ? APP_CONFIG.WEBGL_PARTICLE_COUNT_MOBILE : APP_CONFIG.WEBGL_PARTICLE_COUNT;
-    const geometry = new THREE.BufferGeometry();
-    const positions = new Float32Array(particleCount * 3);
-
-    for (let i = 0; i < particleCount * 3; i++) {
-        positions[i] = (Math.random() - 0.5) * 20;
-    }
-
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    const material = new THREE.PointsMaterial({
-        color: 0x444444,
-        size: 0.05,
-        transparent: true,
-        opacity: 0.6
-    });
-    const particles = new THREE.Points(geometry, material);
-    scene.add(particles);
-
-    function animate() {
-        requestAnimationFrame(animate);
-        particles.rotation.y += 0.0005;
-        particles.position.y += Math.sin(Date.now() * 0.001) * 0.002;
-        renderer.render(scene, camera);
-    }
-    animate();
-
-    window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
+    try {
+        const scene = new THREE.Scene();
+        // No static background color - transparency enabled via renderer
+        
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
         renderer.setSize(window.innerWidth, window.innerHeight);
-    });
+        camera.position.z = 5;
+
+        const particleCount = isMobileDevice() ? APP_CONFIG.WEBGL_PARTICLE_COUNT_MOBILE : APP_CONFIG.WEBGL_PARTICLE_COUNT;
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(particleCount * 3);
+
+        for (let i = 0; i < particleCount * 3; i++) {
+            positions[i] = (Math.random() - 0.5) * 20;
+        }
+
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        
+        // 3C: Global Material for color tweening
+        particleMaterial = new THREE.PointsMaterial({
+            color: 0x444444, // Initial Color
+            size: 0.05,
+            transparent: true,
+            opacity: 0.6
+        });
+        
+        const particles = new THREE.Points(geometry, particleMaterial);
+        scene.add(particles);
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // 3C: Color Linear Interpolation
+            if (particleMaterial) {
+                particleMaterial.color.lerp(targetColor, 0.05);
+            }
+
+            particles.rotation.y += 0.0005;
+            particles.position.y += Math.sin(Date.now() * 0.001) * 0.002;
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+    } catch (e) {
+        console.error("WebGL Error:", e);
+        enableFallbackMode();
+    }
+}
+
+function enableFallbackMode() {
+    document.body.classList.add('fallback-active');
+    const fallbackDiv = document.createElement('div');
+    fallbackDiv.className = 'fallback-bg';
+    document.body.appendChild(fallbackDiv);
+    const canvas = document.getElementById('webgl-canvas');
+    if (canvas) canvas.style.display = 'none';
 }
 
 // ============================================================================
@@ -1050,7 +1207,7 @@ async function downloadGenerated() {
 }
 
 // ============================================================================
-// EXPORT FUNCTIONS TO WINDOW (for inline onclick handlers)
+// EXPORT FUNCTIONS TO WINDOW
 // ============================================================================
 window.nextSlide = nextSlide;
 window.prevSlide = prevSlide;
@@ -1078,10 +1235,11 @@ window.shareImage = shareImage;
 window.closeGenerationDisplay = closeGenerationDisplay;
 window.viewFullResult = viewFullResult;
 window.downloadGenerated = downloadGenerated;
+// Export Remix function (2B)
+window.remixImage = remixImage; 
 window.downloadFromModal = async function () {
     const url = document.getElementById('result-image').src;
     if (url) {
         await downloadImageDirect(url);
     }
-
 };

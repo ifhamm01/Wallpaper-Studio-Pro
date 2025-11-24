@@ -1,106 +1,124 @@
+// --- START OF FILE config.js ---
 
 export const GENRES = [
     {
         id: 'cyberpunk',
         name: 'Cyber City',
         prompt: 'futuristic cyberpunk mega-city, neon-soaked skyline, holograms, rainy night, high-tech vibes',
-        image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&q=80'
+        image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&q=80',
+        color: 0xcd00ff // Neon Purple
     },
     {
         id: 'nature',
         name: 'Deep Nature',
         prompt: 'majestic mountain vista, dense emerald forests, warm golden hour glow, serene and untamed',
-        image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80'
+        image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
+        color: 0x228b22 // Forest Green
     },
     {
         id: 'space',
         name: 'Cosmos',
         prompt: 'expansive cosmic nebula, radiant star fields, drifting galactic dust, epic cinematic scale',
-        image: 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=800&q=80'
+        image: 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=800&q=80',
+        color: 0x000080 // Navy Blue
     },
     {
         id: 'abstract',
         name: 'Abstract',
         prompt: '3D abstract geometry, fluid organic forms, translucent glass textures, sleek minimal design',
-        image: 'https://images.unsplash.com/photo-1557672172-298e090bd0f1?w=800&q=80'
+        image: 'https://images.unsplash.com/photo-1557672172-298e090bd0f1?w=800&q=80',
+        color: 0xffa500 // Orange
     },
     {
         id: 'cars',
         name: 'Supercars',
         prompt: 'sleek hypercar on asphalt, dynamic motion blur, glossy reflections, dramatic cinematic lighting',
-        image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&q=80'
+        image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&q=80',
+        color: 0xdc143c // Crimson Red
     },
     {
         id: 'zen',
         name: 'Zen Garden',
         prompt: 'serene Japanese zen garden, falling cherry blossoms, tranquil water features, soft pastel lighting',
-        image: 'https://images.unsplash.com/photo-1528164344705-47542687000d?w=800&q=80'
+        image: 'https://images.unsplash.com/photo-1528164344705-47542687000d?w=800&q=80',
+        color: 0xffb7c5 // Cherry Blossom Pink
     },
     {
         id: 'ocean',
         name: 'Ocean Depths',
         prompt: 'vibrant coral reef, colorful tropical marine life, crystal-clear blue water, shimmering sunbeams',
-        image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&q=80'
+        image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&q=80',
+        color: 0x00ced1 // Dark Turquoise
     },
     {
         id: 'fantasy',
         name: 'Fantasy Realm',
         prompt: 'enchanted fantasy realm, floating sky islands, glowing mystical auroras, epic wonder',
-        image: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&q=80'
+        image: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&q=80',
+        color: 0x9370db // Medium Purple
     },
     {
         id: 'pastel',
         name: 'Pastel Dreamscape',
         prompt: 'dreamy minimalist landscape, soft pastel palette, ethereal diffuse light, serene abstract skies',
-        image: 'https://images.unsplash.com/photo-1533038590840-1cde6e668a91?w=800&q=80'
+        image: 'https://images.unsplash.com/photo-1533038590840-1cde6e668a91?w=800&q=80',
+        color: 0xb0e0e6 // Powder Blue
     },
     {
         id: 'cozyinterior',
         name: 'Cozy Interior',
         prompt: 'cozy hygge room, warm sunlit windows, plush soft textures, layered pillows, peaceful still life',
-        image: 'https://plus.unsplash.com/premium_photo-1674815329488-c4fc6bf4ced8'
+        image: 'https://plus.unsplash.com/premium_photo-1674815329488-c4fc6bf4ced8',
+        color: 0xd2691e // Chocolate/Warm Brown
     },
     {
         id: 'lofi',
         name: 'Lo-fi Study Vibes',
         prompt: 'lofi study ambience, rainy window reflections, warm lamp glow, steaming mug, calm chilled night',
-        image: 'https://images.unsplash.com/photo-1534067783941-51c9c23ecefd?w=800&q=80'
+        image: 'https://images.unsplash.com/photo-1534067783941-51c9c23ecefd?w=800&q=80',
+        color: 0x483d8b // Dark Slate Blue
     },
     {
         id: 'goldenhour',
         name: 'Golden Hour City',
         prompt: 'urban skyline at golden hour, rich warm sunlight, cinematic lens flares, calm atmospheric cityscape',
-        image: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=800&q=80'
+        image: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=800&q=80',
+        color: 0xff8c00 // Dark Orange
     },
     {
         id: 'sky',
         name: 'Sky & Clouds',
         prompt: 'majestic rolling clouds, vibrant sunrise or sunset, expansive celestial atmosphere, dreamy skyscape',
-        image: 'https://images.unsplash.com/photo-1501630834273-4b5604d2ee31?w=800&q=80'
+        image: 'https://images.unsplash.com/photo-1501630834273-4b5604d2ee31?w=800&q=80',
+        color: 0x87ceeb // Sky Blue
     },
     {
         id: 'terrain',
         name: 'Rough Terrain',
         prompt: 'rocky canyon landscapes, rugged cliffs, raw geological textures, desert badlands, earthy tones',
-        image: 'https://images.unsplash.com/photo-1546514355-7fdc90ccbd03?w=800&q=80'
+        image: 'https://images.unsplash.com/photo-1546514355-7fdc90ccbd03?w=800&q=80',
+        color: 0xa0522d // Sienna
     },
     {
         id: 'stilllife',
         name: 'Still Life',
         prompt: 'classic still life composition, arranged fruit and objects, dramatic chiaroscuro lighting, fine art detail',
-        image: 'https://images.unsplash.com/photo-1588263823647-ce3546d42bfe?w=800&q=80'
+        image: 'https://images.unsplash.com/photo-1588263823647-ce3546d42bfe?w=800&q=80',
+        color: 0x8b4513 // Saddle Brown
     },
     {
         id: 'iridescence',
         name: 'Iridescence',
         prompt: 'holographic iridescent textures, shimmering pearl colors, liquid metal reflections, prismatic light diffraction',
-        image: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=800&q=80'
+        image: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=800&q=80',
+        color: 0x00ffff // Cyan
     },
     {
         id: 'flora',
         name: 'Lush Flora',
         prompt: 'exotic botanical garden, intricate leaf patterns, vibrant blooming flowers, macro nature details',
-        image: 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=800&q=80'
+        image: 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=800&q=80',
+        color: 0x32cd32 // Lime Green
     }
 ];
 
@@ -256,6 +274,3 @@ export const APP_CONFIG = {
     WEBGL_PARTICLE_COUNT: 600,
     WEBGL_PARTICLE_COUNT_MOBILE: 300
 };
-
-
-

@@ -1,11 +1,27 @@
-/* Wallpaper Studio Pro - Styles */
+/* --- START OF FILE style.css --- */
 
-/* Base Styles */
+/* =========================================
+   1. VARIABLES & BASE SETUP (Aurora Effect)
+   ========================================= */
+:root {
+    /* Dynamic Aurora Colors (Updated by JS based on Genre) */
+    --aurora-color: rgba(60, 20, 100, 0.4);
+    --aurora-color-secondary: rgba(20, 20, 60, 0.2);
+    --mouse-x: 50%;
+    --mouse-y: 50%;
+}
+
 body {
-    background-color: #000;
+    background-color: #050505;
     color: white;
     overflow-x: hidden;
     position: relative;
+    /* Aurora Background Effect */
+    background-image: 
+        radial-gradient(circle at 10% 20%, var(--aurora-color) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, var(--aurora-color-secondary) 0%, transparent 40%);
+    background-attachment: fixed;
+    transition: background-image 1s ease-in-out;
 }
 
 /* Premium Noise Texture Overlay */
@@ -18,14 +34,14 @@ body::before {
     height: 100%;
     z-index: 1; /* Lowest layer */
     pointer-events: none;
-    opacity: 0.08;
+    opacity: 0.07;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
     background-repeat: repeat;
     background-size: 200px 200px;
     mix-blend-mode: overlay;
 }
 
-/* Subtle Paper Grain for Glassmorphic Elements */
+/* Subtle Paper Grain */
 body::after {
     content: '';
     position: fixed;
@@ -33,11 +49,10 @@ body::after {
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 2; /* Second lowest layer */
+    z-index: 2;
     pointer-events: none;
     opacity: 0.03;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='grain'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.65' numOctaves='3' seed='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23grain)' opacity='0.5'/%3E%3C/svg%3E");
-    background-repeat: repeat;
     background-size: 150px 150px;
     animation: grain-shift 8s steps(10) infinite;
 }
@@ -55,20 +70,126 @@ body::after {
     90% { transform: translate(-10%, 10%); }
 }
 
-/* WebGL Background */
+/* =========================================
+   2. WEBGL & FALLBACK
+   ========================================= */
 #webgl-canvas {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: -1;
+    z-index: 0; /* Behind content, above aurora bg */
 }
 
-/* Carousel Styles */
+/* Fallback for WebGL failure */
+.fallback-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
+    display: none;
+}
+.fallback-active .fallback-bg {
+    display: block;
+}
+
+/* =========================================
+   3. LAYOUT & CARDS (Shiny Border)
+   ========================================= */
+.perspective-container {
+    perspective: 1000px;
+    position: relative;
+    z-index: 10;
+}
+
+#tilt-wrapper {
+    transform-style: preserve-3d;
+    transition: transform 0.1s ease-out; /* Parallax speed */
+}
+
+.split-card-container {
+    height: 75vh;
+    max-height: 750px;
+    border-radius: 2.5rem;
+    overflow: hidden;
+    position: relative;
+    z-index: 20;
+    
+    /* Glassmorphism */
+    background: rgba(26, 26, 26, 0.4);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 
+        0 8px 32px 0 rgba(0, 0, 0, 0.37),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+        
+    transition: height 0.3s ease, width 0.3s ease;
+    
+    /* Float Animation */
+    animation: float-card 6s ease-in-out infinite;
+}
+
+@keyframes float-card {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+
+/* Shiny Border Effect (Category A) */
+.split-card-container::after {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    z-index: -1;
+    border-radius: inherit;
+    background: radial-gradient(
+        400px circle at var(--mouse-x) var(--mouse-y),
+        rgba(255, 255, 255, 0.3),
+        transparent 40%
+    );
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.split-card-container.desktop-mode {
+    height: 300px;
+    width: 100%;
+    border-radius: 1.5rem;
+}
+
+/* Center Connector */
+.plus-connector {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 30;
+    background: rgba(26, 26, 26, 0.6);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+    transition: transform 0.2s ease;
+}
+
+.plus-connector:hover {
+    transform: translate(-50%, -50%) scale(1.1);
+}
+
+/* =========================================
+   4. CAROUSEL (Transitions)
+   ========================================= */
 .carousel-track {
     display: flex;
-    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+    transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+    will-change: transform;
 }
 
 .carousel-item {
@@ -80,309 +201,365 @@ body::after {
     position: relative;
     background-size: cover;
     background-position: center;
+    
+    /* Category B: Scale/Fade Transitions */
+    transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.6s ease, filter 0.6s ease;
+    transform: scale(0.9);
+    opacity: 0.3;
+    filter: grayscale(100%) blur(2px);
+}
+
+.carousel-item.is-active {
+    transform: scale(1);
+    opacity: 1;
+    filter: grayscale(0%) blur(0px);
 }
 
 .carousel-overlay {
     background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.7));
     backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
     pointer-events: none;
 }
 
-/* --- NAVIGATION ARROWS (Large & Static) --- */
+/* =========================================
+   5. CONTROLS (Magnetic & Navigation)
+   ========================================= */
+.btn-haptic {
+    transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease;
+    will-change: transform;
+    cursor: pointer;
+}
+
+.btn-haptic:active {
+    transform: scale(0.95); /* Adjusted for JS magnetic effect */
+}
+
+/* Navigation Arrows */
 .group button[onclick*="Slide"] {
     position: absolute;
-    cursor: pointer;
-    
-    /* Clickability Assurance */
-    z-index: 100 !important; 
-    pointer-events: auto !important;
-    opacity: 1 !important;
-
-    /* Sizing & Positioning */
-    width: 56px !important;
-    height: 56px !important;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
-    
-    /* Premium Glass Look */
-    background-color: rgba(0, 0, 0, 0.4) !important;
+    background-color: rgba(0, 0, 0, 0.4);
     border: 1px solid rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(4px);
     box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    
-    /* Alignment */
     display: flex;
     align-items: center;
     justify-content: center;
-    
-    /* Smooth Transition */
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-
-/* HOVER: Glow & Brightness */
-.group button[onclick*="Slide"]:hover {
-    background-color: rgba(255, 255, 255, 0.25) !important;
-    border-color: rgba(255, 255, 255, 0.6);
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
-    transform: scale(1.05); /* Slight growth */
-}
-
-/* ACTIVE: Click press effect */
-.group button[onclick*="Slide"]:active {
-    background-color: rgba(255, 255, 255, 0.4) !important;
-    transform: scale(0.95);
-}
-
-/* ICON: Scale & Shadow Animation */
-.group button[onclick*="Slide"] svg {
-    width: 32px !important;
-    height: 32px !important;
-    stroke-width: 2.5px;
-    transition: transform 0.3s ease, filter 0.3s ease;
-}
-
-.group button[onclick*="Slide"]:hover svg {
-    filter: drop-shadow(0 0 6px rgba(255,255,255,0.9)); /* White glow on icon */
-    transform: scale(1.15); /* Icon pops out */
-}
-
-/* --- HIDE ARROWS When Generating --- */
-.split-card-container.generating-active button[onclick*="Slide"] {
-    opacity: 0 !important;
-    pointer-events: none !important;
-    transform: translateY(-50%) scale(0.8) !important;
-}
-
-/* Scrollbar Hide */
-.no-scrollbar::-webkit-scrollbar {
-    display: none;
-}
-
-.no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
-
-/* 3D Tilt Container */
-.perspective-container {
-    perspective: 1000px;
-    position: relative;
-    z-index: 10; /* Ensure container is above noise */
-}
-
-/* Floating Animation Keyframes */
-@keyframes float-card {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-    100% { transform: translateY(0px); }
-}
-
-.split-card-container {
-    height: 75vh;
-    max-height: 750px;
-    border-radius: 2.5rem;
-    overflow: hidden;
-    position: relative;
-    
-    /* FIX FOR CORRUPTION */
-    z-index: 20; /* Forces card ABOVE the noise texture (z-index 1 & 2) */
-    
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    background: rgba(26, 26, 26, 0.4);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37),
-        inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
-        
-    /* Floating Animation */
-    animation: float-card 6s ease-in-out infinite;
-    transition: height 0.3s ease, width 0.3s ease;
-}
-
-/* Aspect Ratio Modifiers */
-.split-card-container.desktop-mode {
-    height: 300px;
-    width: 100%;
-    border-radius: 1.5rem;
-}
-
-.plus-connector {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%); /* Removed translateZ for safer rendering */
-    z-index: 30;
-    background: rgba(26, 26, 26, 0.6);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 2px solid rgba(255, 255, 255, 0.15);
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5),
-        inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
-    transition: transform 0.2s ease;
-}
-
-.plus-connector:hover {
-    transform: translate(-50%, -50%) scale(1.1);
-}
-
-/* Color Dot Styles */
-.color-dot {
-    transition: all 0.2s ease;
-    cursor: pointer;
-}
-
-.color-dot:hover {
-    transform: scale(1.15);
-}
-
-.color-dot.selected {
-    transform: scale(1.2);
-    box-shadow: 0 0 0 2px white;
-}
-
-/* Toast Notification */
-.toast {
-    position: fixed;
-    bottom: 2rem;
-    left: 50%;
-    transform: translateX(-50%) translateY(100px);
-    background: rgba(255, 255, 255, 0.95);
-    color: #000;
-    padding: 1rem 2rem;
-    border-radius: 9999px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 100;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    font-weight: 600;
-    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.3s ease;
-    opacity: 0;
+    opacity: 0; /* Hidden by default until hover */
 }
 
-.toast.show {
-    transform: translateX(-50%) translateY(0);
+.group:hover button[onclick*="Slide"] {
     opacity: 1;
 }
 
-.toast.success {
-    background: linear-gradient(135deg, #10b981, #059669);
-    color: white;
+.group button[onclick*="Slide"]:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
 }
 
-.toast.error {
-    background: linear-gradient(135deg, #ef4444, #dc2626);
-    color: white;
+.split-card-container.generating-active button[onclick*="Slide"] {
+    opacity: 0 !important;
+    pointer-events: none !important;
 }
 
-.toast.info {
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
-    color: white;
+/* =========================================
+   6. GENERATION & EFFECTS (Confetti)
+   ========================================= */
+#generation-overlay {
+    border-radius: 2.5rem;
+    background: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(16px);
 }
 
-/* Loading Animation */
-@keyframes pulse-glow {
+#generation-overlay.desktop-mode {
+    border-radius: 1.5rem;
+}
 
-    0%,
-    100% {
-        opacity: 1;
-        transform: scale(1);
-    }
-
-    50% {
-        opacity: 0.7;
-        transform: scale(1.05);
-    }
+#webgl-generation-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
 }
 
 .pulse-glow {
     animation: pulse-glow 2s ease-in-out infinite;
 }
 
-/* Button Haptic Feedback */
-@keyframes button-press {
-    0% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(0.95);
-    }
-
-    100% {
-        transform: scale(1);
-    }
+/* Confetti Particle */
+.confetti {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
 }
 
-.btn-haptic:active {
-    animation: button-press 0.2s ease;
+/* =========================================
+   History Catalog Styles 
+   ========================================= */
+
+#history-list {
+    display: grid;
+    /* Responsive Columns: At least 150px wide, filling space */
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
+    gap: 1rem;
+    padding: 1.5rem;
+    padding-bottom: 150px;
+    width: 100%;
+    /* Ensure grid respects box model */
+    box-sizing: border-box;
+    /* Align items to start to prevent stretching weirdness */
+    align-items: start;
 }
 
-/* History Item Hover Effect */
-.history-item {
-    transition: all 0.2s ease;
+.history-card {
+    position: relative;
+    width: 100%;
+    /* THE FIX: Force 9:16 Aspect Ratio using Padding Hack */
+    /* 16 / 9 = 1.777... -> 177.77% */
+    padding-bottom: 177.77%; 
+    height: 0; /* Collapse actual height, rely on padding */
+    
+    background: #1a1a1a;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    
+    /* Animation */
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
-.history-item:hover {
-    transform: translateX(-4px);
-    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+.history-card.reveal {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Image is absolute to fit the padding box */
+.history-card-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.5s ease;
+    z-index: 1;
+}
+
+.history-card:hover .history-card-img {
+    transform: scale(1.05);
+}
+
+/* --- OVERLAY & BUTTONS --- */
+.history-actions-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    /* Stronger gradient for readability */
+    background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.3) 40%, transparent 100%);
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0.75rem;
+    
+    /* Interaction */
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.history-card:hover .history-actions-overlay {
+    opacity: 1;
+}
+
+/* Genre Label (Top Left of Card) */
+.overlay-info {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 20;
+    pointer-events: none;
+}
+.overlay-title {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: rgba(255,255,255,0.9);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: rgba(0,0,0,0.5);
+    padding: 2px 6px;
+    border-radius: 4px;
+    backdrop-filter: blur(4px);
+}
+
+/* Buttons */
+.history-btn-group {
+    display: flex;
+    gap: 0.4rem;
+    width: 100%;
+}
+
+.catalog-btn {
+    flex: 1;
+    height: 32px; /* Compact buttons */
+    border-radius: 0.4rem;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.catalog-btn:hover {
+    background: white;
+    color: black;
+    transform: translateY(-2px);
+}
+
+.catalog-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* Delete specific hover */
+.btn-delete:hover {
+    background: #ef4444;
+    color: white;
+    border-color: #ef4444;
+}
+
+/* Favorite Star */
+.history-fav-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 20;
+    background: rgba(0,0,0,0.3);
+    backdrop-filter: blur(4px);
+    border-radius: 50%;
+    padding: 6px;
+    color: white;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.history-card:hover .history-fav-btn, 
+.history-fav-btn.active {
+    opacity: 1;
+}
+
+.history-fav-btn.active {
+    color: #fbbf24;
+    fill: #fbbf24;
+}
+
+/* --- MOBILE FIXES --- */
+@media (max-width: 640px) {
+    #history-list {
+        grid-template-columns: repeat(2, 1fr); /* 2 Columns */
+        gap: 0.5rem;
+        padding: 0.75rem;
+    }
+
+    /* Always show buttons on mobile */
+    .history-actions-overlay {
+        opacity: 1 !important;
+        background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 50%);
+    }
+    
+    .history-fav-btn {
+        opacity: 1 !important;
+    }
+}
+/* =========================================
+   8. UTILITIES & MODALS
+   ========================================= */
+/* Color Dots */
+.color-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.2s;
+    border: 2px solid transparent;
+}
+.color-dot:hover { transform: scale(1.2); }
+.color-dot.selected { 
+    transform: scale(1.3); 
+    border-color: white; 
+    box-shadow: 0 0 10px rgba(255,255,255,0.3);
 }
 
 /* Advanced Controls Panel */
 .advanced-controls {
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.3s ease, opacity 0.3s ease;
+    transition: max-height 0.4s cubic-bezier(0, 1, 0, 1), opacity 0.4s ease;
     opacity: 0;
 }
-
 .advanced-controls.expanded {
-    max-height: 500px;
+    max-height: 400px;
     opacity: 1;
+    margin-top: 1rem;
 }
 
-/* Favorites Star */
-.favorite-star {
-    transition: all 0.2s ease;
-    cursor: pointer;
+/* Toast */
+.toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translate(-50%, 100px);
+    background: rgba(20, 20, 20, 0.9);
+    border: 1px solid rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    z-index: 1000;
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
-
-.favorite-star:hover {
-    transform: scale(1.2) rotate(15deg);
-}
-
-.favorite-star.active {
-    color: #fbbf24;
-    fill: #fbbf24;
-}
+.toast.show { transform: translate(-50%, 0); opacity: 1; }
+.toast.success i { color: #10b981; }
+.toast.error i { color: #ef4444; }
 
 /* Share Menu */
 .share-menu {
     position: absolute;
     bottom: 100%;
     left: 50%;
-    transform: translateX(-50%) translateY(-10px);
-    background: rgba(30, 30, 30, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 1rem;
-    padding: 0.5rem;
-    display: flex;
-    gap: 0.5rem;
+    transform: translateX(-50%) translateY(10px);
     opacity: 0;
     pointer-events: none;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    padding: 5px;
+    border-radius: 8px;
+    display: flex;
+    gap: 5px;
 }
-
 .share-menu.active {
+    transform: translateX(-50%) translateY(-10px);
     opacity: 1;
-    pointer-events: all;
-    transform: translateX(-50%) translateY(-20px);
+    pointer-events: auto;
 }
 
 .share-btn {
@@ -391,13 +568,14 @@ body::after {
     background: rgba(255, 255, 255, 0.1);
     transition: all 0.2s ease;
 }
-
 .share-btn:hover {
     background: rgba(255, 255, 255, 0.2);
     transform: translateY(-2px);
 }
 
-/* Responsive Improvements */
+/* =========================================
+   9. RESPONSIVE ADJUSTMENTS
+   ========================================= */
 @media (max-width: 640px) {
     .split-card-container {
         height: 65vh;
@@ -407,289 +585,43 @@ body::after {
     #history-drawer {
         width: 100%;
     }
-
-    .batch-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-/* Accessibility */
-.sr-only {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border-width: 0;
-}
-
-/* Focus Visible for Keyboard Navigation */
-*:focus-visible {
-    outline: 2px solid white;
-    outline-offset: 2px;
-}
-
-/* Generation Display (Inline in Main Card) */
-#generation-overlay {
-    border-radius: 2.5rem;
-    transition: opacity 0.3s ease;
-}
-
-#generation-overlay.desktop-mode {
-    border-radius: 1.5rem;
-}
-
-#webgl-generation-canvas {
-    filter: blur(0px);
-    border-radius: inherit;
-}
-
-#generation-result-image {
-    border-radius: inherit;
-    transition: opacity 0.5s ease;
-}
-
-#generation-actions {
-    border-radius: 0 0 2.5rem 2.5rem;
-}
-
-#generation-actions button {
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-}
-
-/* Smooth Transitions */
-* {
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* =========================================
-   History Catalog Styles (Large Card Update)
-   ========================================= */
-
-/* The Container */
-#history-list {
-    scrollbar-width: none; 
-    -ms-overflow-style: none;
-    padding-bottom: 150px; /* More scrolling space at bottom */
-}
-
-#history-list::-webkit-scrollbar { 
-    display: none; 
-}
-
-/* Card Animation */
-.history-card {
-    opacity: 0;
-    transform: translateY(60px) scale(0.9); /* More dramatic entry */
-    transition: 
-        opacity 0.7s cubic-bezier(0.2, 0.8, 0.2, 1),
-        transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.history-card.reveal {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-}
-
-/* Card Container */
-.history-card {
-    position: relative;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 1.5rem; /* Larger radius */
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.5); /* Deeper shadow */
-}
-
-/* Image Wrapper */
-.history-card-image-wrapper {
-    position: relative;
-    width: 100%;
-    /* FIX: Maintain aspect ratio but don't exceed 70% of screen height */
-    aspect-ratio: 9/16; 
-    max-height: 70vh; 
-    overflow: hidden;
-    cursor: pointer;
-    background-color: black;
-}
-
-.history-card-img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain; /* Ensures the whole image is seen within the box */
-    background: #050505; /* Dark background for letterboxing if needed */
-    transition: transform 0.7s ease;
-}
-
-/* Zoom effect on hover */
-.history-card:hover .history-card-img {
-    transform: scale(1.03);
-}
-
-/* Overlay Actions */
-.history-actions-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%);
-    opacity: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding: 2rem;
-    transition: opacity 0.3s ease;
-}
-
-.history-card:hover .history-actions-overlay {
-    opacity: 1;
-}
-
-/* Action Buttons - Made Larger */
-.history-btn-group {
-    display: flex;
-    gap: 1rem;
-    transform: translateY(20px);
-    transition: transform 0.3s ease;
-}
-
-.history-card:hover .history-btn-group {
-    transform: translateY(0);
-}
-
-.catalog-btn {
-    flex: 1;
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
-    padding: 1rem; /* Larger buttons */
-    border-radius: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1rem;
-    font-weight: 600;
-    transition: all 0.2s ease;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-}
-
-.catalog-btn:hover {
-    background: white;
-    color: black;
-    transform: translateY(-2px);
-}
-
-/* Info Section */
-.history-info {
-    padding: 1.5rem;
-    background: #141414;
-    border-top: 1px solid rgba(255,255,255,0.05);
-}
-
-.history-title {
-    font-weight: 800;
-    color: #fff;
-    font-size: 1.25rem; /* Larger Text */
-    margin-bottom: 0.5rem;
-    letter-spacing: -0.02em;
-}
-
-.history-date {
-    font-size: 0.875rem;
-    color: #888;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-/* Favorite Star */
-.history-fav-btn {
-    position: absolute;
-    top: 1.5rem;
-    right: 1.5rem;
-    z-index: 10;
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(8px);
-    padding: 0.75rem; /* Larger hit area */
-    border-radius: 50%;
-    opacity: 0;
-    transform: scale(0.8);
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    border: 1px solid rgba(255,255,255,0.1);
-}
-
-.history-card:hover .history-fav-btn,
-.history-fav-btn.active {
-    opacity: 1;
-    transform: scale(1);
-}
-
-.history-fav-btn.active {
-    background: rgba(251, 191, 36, 0.2);
-    color: #fbbf24;
-    border-color: rgba(251, 191, 36, 0.4);
-}
-
-/* Animation for revealing empty state */
-.reveal-on-load {
-    transition: opacity 0.5s ease;
-}
-
-/* Ensure tab icons are aligned */
-#history-drawer button i {
-    flex-shrink: 0;
-}
-.fallback-bg {
-    position: fixed;
-    inset: 0;
-    z-index: -2;
-    background: radial-gradient(circle at center, #2a2a2a 0%, #000000 100%);
-    display: none;
-}
-.fallback-active .fallback-bg {
-    display: block;
-}
-
-/* 3A: Parallax Container - Make sure the wrapper has 3D space */
-#tilt-wrapper {
-    transform-style: preserve-3d;
-    transition: transform 0.1s ease-out; /* Quick response for mouse movement */
-}
-
-/* 3B: Carousel Slide Scaling */
-/* The track handles the sliding, but the items handle the scale effect */
-.carousel-item {
-    min-width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    background-size: cover;
-    background-position: center;
     
-    /* New Transition Logic */
-    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s ease;
-    transform: scale(0.85); /* Default inactive state: smaller */
-    opacity: 0.4;           /* Default inactive state: faded */
-    filter: grayscale(100%);
-}
-
-/* Logic: The active slide gets full size and color */
-.carousel-item.is-active {
-    transform: scale(1);
-    opacity: 1;
-    filter: grayscale(0%);
-}
-
-/* Adjust the carousel track to ensure items are centered during transition */
-.carousel-track {
-    display: flex;
-    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
-    will-change: transform;
+    #history-list {
+        grid-template-columns: repeat(2, 1fr); /* 2 Columns on Mobile */
+        gap: 0.5rem;
+        padding: 0.5rem;
+    }
+    
+    .history-card-image-wrapper {
+        aspect-ratio: 1/1.5; /* Slightly taller aspect ratio on mobile */
+    }
+    
+    /* Force Overlay Visible on Mobile so buttons are clickable */
+    .history-actions-overlay {
+        opacity: 1 !important;
+        background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 40%);
+        padding-bottom: 0.5rem;
+    }
+    
+    /* Hide the text info on mobile to save space (Pinterest style) */
+    .history-info {
+        display: none; 
+    }
+    
+    /* Make buttons slightly smaller on mobile to fit */
+    .catalog-btn {
+        height: 32px;
+    }
+    .catalog-btn i {
+        width: 14px;
+        height: 14px;
+    }
+    
+    .history-fav-btn {
+        opacity: 1 !important;
+        transform: scale(1) !important;
+        top: 5px;
+        right: 5px;
+        padding: 5px;
+    }
 }

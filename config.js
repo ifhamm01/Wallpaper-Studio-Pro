@@ -4,121 +4,121 @@ export const GENRES = [
     {
         id: 'cyberpunk',
         name: 'Cyber City',
-        prompt: 'futuristic metropolis, neon-soaked skyscrapers, rain-slicked streets, holograms, high-tech urban scenery',
+        prompt: 'futuristic cyberpunk mega-city, neon-soaked skyline, holograms, rainy night, high-tech vibes',
         image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&q=80',
-        color: 0xcd00ff
+        color: 0xcd00ff // Neon Purple
     },
     {
         id: 'nature',
         name: 'Deep Nature',
-        prompt: 'majestic mountains, dense ancient forests, flowing rivers, mist, untouched wilderness',
+        prompt: 'majestic mountain vista, dense emerald forests, warm golden hour glow, serene and untamed',
         image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
-        color: 0x228b22
+        color: 0x228b22 // Forest Green
     },
     {
         id: 'space',
         name: 'Cosmos',
-        prompt: 'deep space nebula, spiral galaxies, distant stars, cosmic dust, planets, celestial void',
+        prompt: 'expansive cosmic nebula, radiant star fields, drifting galactic dust, epic cinematic scale',
         image: 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=800&q=80',
-        color: 0x000080
+        color: 0x000080 // Navy Blue
     },
     {
         id: 'abstract',
         name: 'Abstract',
-        prompt: 'flowing geometric shapes, complex patterns, surreal forms, liquid motion, artistic composition',
+        prompt: '3D abstract geometry, fluid organic forms, translucent glass textures, sleek minimal design',
         image: 'https://images.unsplash.com/photo-1557672172-298e090bd0f1?w=800&q=80',
-        color: 0xffa500
+        color: 0xffa500 // Orange
     },
     {
         id: 'cars',
         name: 'Supercars',
-        prompt: 'sleek hypercar, asphalt track, aerodynamic design, automotive engineering',
+        prompt: 'sleek hypercar on asphalt, dynamic motion blur, glossy reflections, dramatic cinematic lighting',
         image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&q=80',
-        color: 0xdc143c
+        color: 0xdc143c // Crimson Red
     },
     {
         id: 'zen',
         name: 'Zen Garden',
-        prompt: 'Japanese zen garden, cherry blossoms, koi pond, stone pathways, bamboo, serenity',
+        prompt: 'serene Japanese zen garden, falling cherry blossoms, tranquil water features, soft pastel lighting',
         image: 'https://images.unsplash.com/photo-1528164344705-47542687000d?w=800&q=80',
-        color: 0xffb7c5
+        color: 0xffb7c5 // Cherry Blossom Pink
     },
     {
         id: 'ocean',
         name: 'Ocean Depths',
-        prompt: 'underwater coral reef, tropical fish, sea turtles, ocean floor, marine life',
+        prompt: 'vibrant coral reef, colorful tropical marine life, crystal-clear blue water, shimmering sunbeams',
         image: 'https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&q=80',
-        color: 0x00ced1
+        color: 0x00ced1 // Dark Turquoise
     },
     {
         id: 'fantasy',
         name: 'Fantasy Realm',
-        prompt: 'magical kingdom, floating islands, glowing crystals, castles, mythical atmosphere',
+        prompt: 'enchanted fantasy realm, floating sky islands, glowing mystical auroras, epic wonder',
         image: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&q=80',
-        color: 0x9370db
+        color: 0x9370db // Medium Purple
     },
     {
         id: 'pastel',
-        name: 'Pastel Dream',
-        prompt: 'rolling hills, fluffy clouds, soft dreamscape, candy-colored horizon, gentle scenery',
+        name: 'Pastel Dreamscape',
+        prompt: 'dreamy minimalist landscape, soft pastel palette, ethereal diffuse light, serene abstract skies',
         image: 'https://images.unsplash.com/photo-1533038590840-1cde6e668a91?w=800&q=80',
-        color: 0xb0e0e6
+        color: 0xb0e0e6 // Powder Blue
     },
     {
         id: 'cozyinterior',
         name: 'Cozy Interior',
-        prompt: 'comfortable bedroom, rain on window, books, warm coffee, string lights, hygge atmosphere',
+        prompt: 'cozy hygge room, warm sunlit windows, plush soft textures, layered pillows, peaceful still life',
         image: 'https://plus.unsplash.com/premium_photo-1674815329488-c4fc6bf4ced8',
-        color: 0xd2691e
+        color: 0xd2691e // Chocolate/Warm Brown
     },
     {
         id: 'lofi',
-        name: 'Lo-fi Vibes',
-        prompt: 'lonely desk at night, city view window, computer screen glow, headphones, nostalgic mood',
+        name: 'Lo-fi Study Vibes',
+        prompt: 'lofi study ambience, rainy window reflections, warm lamp glow, steaming mug, calm chilled night',
         image: 'https://images.unsplash.com/photo-1534067783941-51c9c23ecefd?w=800&q=80',
-        color: 0x483d8b
+        color: 0x483d8b // Dark Slate Blue
     },
     {
         id: 'goldenhour',
-        name: 'Golden Hour',
-        prompt: 'urban skyline, busy streets, glass buildings, sun flares, warm sunset lighting',
+        name: 'Golden Hour City',
+        prompt: 'urban skyline at golden hour, rich warm sunlight, cinematic lens flares, calm atmospheric cityscape',
         image: 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=800&q=80',
-        color: 0xff8c00
+        color: 0xff8c00 // Dark Orange
     },
     {
         id: 'sky',
         name: 'Sky & Clouds',
-        prompt: 'cloud formations, sunrise horizon, atmospheric sky, celestial vastness',
+        prompt: 'majestic rolling clouds, vibrant sunrise or sunset, expansive celestial atmosphere, dreamy skyscape',
         image: 'https://images.unsplash.com/photo-1501630834273-4b5604d2ee31?w=800&q=80',
-        color: 0x87ceeb
+        color: 0x87ceeb // Sky Blue
     },
     {
         id: 'terrain',
         name: 'Rough Terrain',
-        prompt: 'rocky canyons, desert cliffs, jagged rocks, geological formations, textured earth',
+        prompt: 'rocky canyon landscapes, rugged cliffs, raw geological textures, desert badlands, earthy tones',
         image: 'https://images.unsplash.com/photo-1546514355-7fdc90ccbd03?w=800&q=80',
-        color: 0xa0522d
+        color: 0xa0522d // Sienna
     },
     {
         id: 'stilllife',
         name: 'Still Life',
-        prompt: 'arranged objects, fruits, vases, cloth drapery, artistic composition',
+        prompt: 'classic still life composition, arranged fruit and objects, dramatic chiaroscuro lighting, fine art detail',
         image: 'https://images.unsplash.com/photo-1588263823647-ce3546d42bfe?w=800&q=80',
-        color: 0x8b4513
+        color: 0x8b4513 // Saddle Brown
     },
     {
         id: 'iridescence',
         name: 'Iridescence',
-        prompt: 'holographic foil texture, prismatic colors, liquid metal, rainbow reflections',
+        prompt: 'holographic iridescent textures, shimmering pearl colors, liquid metal reflections, prismatic light diffraction',
         image: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=800&q=80',
-        color: 0x00ffff
+        color: 0x00ffff // Cyan
     },
     {
         id: 'flora',
         name: 'Lush Flora',
-        prompt: 'exotic flowers, lush leaves, botanical garden, blooming nature',
+        prompt: 'exotic botanical garden, intricate leaf patterns, vibrant blooming flowers, macro nature details',
         image: 'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?w=800&q=80',
-        color: 0x32cd32
+        color: 0x32cd32 // Lime Green
     }
 ];
 
@@ -126,115 +126,115 @@ export const STYLES = [
     {
         id: 'minimal',
         name: 'Minimalist',
-        prompt: 'minimalist art style, clean lines, flat solid colors, vast negative space, simple vector aesthetics, decluttered',
+        prompt: 'minimalist visual style, crisp clean lines, flat muted colors, spacious negative composition',
         image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&q=80'
     },
     {
         id: 'oil',
         name: 'Oil Paint',
-        prompt: 'impasto oil painting, thick visible brushstrokes, canvas texture, rich color blending, classical fine art style',
+        prompt: 'traditional oil painting, rich textured brush strokes, impasto depth, timeless classical art',
         image: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=800&q=80'
     },
     {
         id: 'neon',
         name: 'Neon Glow',
-        prompt: 'neon lighting style, dark background, glowing outlines, high contrast, synthwave aesthetic, vibrant saturated colors',
+        prompt: 'neon glow aesthetic, highly saturated cyber colors, deep dark backdrop, synthwave retro vibes',
         image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800&q=80'
     },
     {
         id: 'sketch',
         name: 'Tech Sketch',
-        prompt: 'technical blueprint style, fine white lines on dark background, schematic drawing, rough pencil sketch texture',
+        prompt: 'technical blueprint schematic, fine white drafting lines on dark background, precise and detailed',
         image: 'https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=800&q=80'
     },
     {
         id: 'clay',
         name: '3D Clay',
-        prompt: '3D plasticine clay render, soft rounded edges, matte finish, fingerprint textures, stop-motion animation look',
+        prompt: '3D clay sculpt render, soft studio lighting, matte smooth surfaces, handcrafted stop-motion vibe',
         image: 'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?w=800&q=80'
     },
     {
         id: 'noir',
         name: 'Film Noir',
-        prompt: 'classic film noir photography, high contrast black and white, deep shadows, dramatic silhouettes, film grain',
+        prompt: 'classic film noir aesthetic, stark black-and-white tones, high contrast, deep dramatic shadows',
         image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=800&q=80'
     },
     {
         id: 'watercolor',
         name: 'Watercolor',
-        prompt: 'watercolor painting, soft bleeding edges, translucent color washes, paper texture, wet ink style',
+        prompt: 'dreamy watercolor painting, soft bleeding edges, flowing organic pigments, artistic texture',
         image: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&q=80'
     },
     {
         id: 'pixel',
         name: 'Pixel Art',
-        prompt: 'retro 16-bit pixel art, game aesthetic, crisp low-resolution sprites, limited color palette, dithering',
+        prompt: 'retro pixel art style, nostalgic 16-bit era visuals, crisp low-res sprites, game aesthetic',
         image: 'https://images.unsplash.com/photo-1671750764695-10c7f164844c'
     },
     {
         id: 'anime',
         name: 'Anime Aesthetic',
-        prompt: 'high-quality anime art, Makoto Shinkai style, vibrant colors, dramatic lighting, detailed linework, cel shading',
+        prompt: 'cinematic anime art, vivid radiant colors, refined linework, dramatic lighting, shinkai-inspired',
         image: 'https://plus.unsplash.com/premium_photo-1661964177687-57387c2cbd14'
     },
     {
         id: 'photoreal',
         name: 'Photorealistic',
-        prompt: 'hyper-realistic photography, 8k resolution, highly detailed, perfect lighting, uncompressed raw quality',
+        prompt: 'ultra-detailed photoreal render, sharp 8K clarity, volumetric light rays, depth-of-field focus',
         image: 'https://images.unsplash.com/photo-1690626826406-c2fc0d344551'
     },
     {
         id: 'voxel',
         name: 'Voxel Art',
-        prompt: 'voxel art style, cubic 3D blocks, isometric view, bright playful colors, digital minecraft aesthetic',
+        prompt: 'charming voxel render, cubic 3D pixel blocks, crisp isometric layout, bright playful colors',
         image: 'https://images.unsplash.com/photo-1743306947426-06d3d970e58f'
     },
     {
         id: 'cinematic',
         name: 'Cinematic',
-        prompt: 'cinematic movie shot, wide aspect ratio, bold color grading, deep bokeh, dramatic lighting, atmospheric',
+        prompt: 'wide-angle cinematic still, bold dramatic color grade, deep shadows and highlights, film-tier quality',
         image: 'https://images.unsplash.com/photo-1610847455028-9e55e62bac33'
     },
     {
         id: 'glitch',
         name: 'Glitch Effect',
-        prompt: 'digital glitch art, RGB color splitting, datamoshing, corrupted video signal, pixel sorting distortion',
+        prompt: 'glitch digital distortion, corrupted data glitching, RGB chromatic split, vivid static noise',
         image: 'https://images.unsplash.com/photo-1634368998864-8984df61cdda'
     },
     {
         id: 'lowpoly',
         name: 'Low Poly',
-        prompt: 'low-poly 3D render, faceted geometric shapes, soft pastel lighting, minimalist polygon art, sharp edges',
+        prompt: 'low-poly 3D render, faceted geometric forms, soft pastel palette, clean minimalist scenery',
         image: 'https://images.unsplash.com/photo-1643143596361-a39511490214'
     },
     {
         id: 'bwphoto',
         name: 'B&W Photo',
-        prompt: 'vintage black and white photography, silver gelatin print, heavy film grain, high contrast monochrome',
+        prompt: 'classic black and white photography, high contrast monochrome, grainy film texture, timeless vintage look',
         image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&q=80'
     },
     {
         id: 'classicpaint',
         name: 'Classic Painting',
-        prompt: 'Renaissance style painting, visible brushwork, dramatic composition, acrylic texture, museum quality',
+        prompt: 'traditional fine art painting, visible brushwork, acrylic or gouache texture, artistic composition',
         image: 'https://images.unsplash.com/photo-1578301978693-85fa9c0320b9?w=800&q=80'
     },
     {
         id: 'graphic',
         name: 'Graphic Design',
-        prompt: 'bold graphic design, vector art, flat distinct shapes, strong typography elements, pop art influence',
+        prompt: 'bold graphic design style, vector art aesthetics, strong typography elements, flat distinct shapes',
         image: 'https://images.unsplash.com/photo-1586974087421-2ba56dab378c'
     },
     {
         id: 'ink',
         name: 'Ink Wash',
-        prompt: 'traditional Sumi-e ink wash, monochromatic flowing black ink, minimalist brush strokes, rice paper texture',
+        prompt: 'traditional ink wash painting, sumi-e style, monochromatic flowing ink, minimalist brush strokes',
         image: 'https://images.unsplash.com/photo-1515405295579-ba7b45403062?w=800&q=80'
     },
     {
         id: 'modernist',
         name: 'Modernist',
-        prompt: 'Bauhaus modernist art, geometric abstraction, primary colors, clean lines, structural composition',
+        prompt: 'mid-century modernist art, Bauhaus influence, geometric abstraction, primary colors, clean structure',
         image: 'https://images.unsplash.com/photo-1554147090-e1221a04a025?w=800&q=80'
     }
 ];
@@ -251,11 +251,11 @@ export const COLOR_BIASES = [
 ];
 
 export const PROMPT_TEMPLATES = [
-    '{genre}, {style}, {color} tones. wallpaper, 8k, highly detailed',
-    'aesthetic wallpaper of {genre}, {style} style',
-    '{style} masterpiece of {genre}, {color} lighting',
-    '{genre} visualized as {style}, aesthetic background',
-    'high quality {genre}, artstyle: {style}'
+    'A serene {genre} scene in {style} style with {color} tones',
+    'Epic {genre} landscape rendered in {style} aesthetic',
+    'Minimalist {genre} composition with {style} treatment',
+    'Dramatic {genre} vista in stunning {style} style',
+    'Atmospheric {genre} environment with {style} rendering'
 ];
 
 export const API_CONFIG = {

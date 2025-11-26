@@ -32,7 +32,7 @@ export const GENRES = [
     {
         id: 'cars',
         name: 'Supercars',
-        prompt: 'supercar,ferrari,lamborgini,mustang glossy reflections, dramatic cinematic lighting',
+        prompt: 'SUpercar moving at fast speed wide angle shot, glossy reflections, dramatic cinematic lighting',
         image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&q=80',
         color: 0xdc143c // Crimson Red
     },
@@ -74,7 +74,7 @@ export const GENRES = [
     {
         id: 'lofi',
         name: 'Lo-fi Study Vibes',
-        prompt: 'lofi study ambience, rainy window reflections, warm lamp glow, steaming mug, calm chilled night',
+        prompt: 'study table with cozy lighting,raining outside, warm lamp glow, steaming mug, calm chilled night',
         image: 'https://images.unsplash.com/photo-1534067783941-51c9c23ecefd?w=800&q=80',
         color: 0x483d8b // Dark Slate Blue
     },
@@ -88,7 +88,7 @@ export const GENRES = [
     {
         id: 'sky',
         name: 'Sky & Clouds',
-        prompt: 'majestic rolling clouds, vibrant sunrise or sunset, expansive celestial atmosphere, dreamy skyscape',
+        prompt: 'majestic rolling clouds, vibrant sunrise or sunset, expansive celestial atmosphere',
         image: 'https://images.unsplash.com/photo-1501630834273-4b5604d2ee31?w=800&q=80',
         color: 0x87ceeb // Sky Blue
     },
@@ -102,7 +102,7 @@ export const GENRES = [
     {
         id: 'stilllife',
         name: 'Still Life',
-        prompt: 'classic still life composition, arranged fruit and objects, dramatic chiaroscuro lighting, fine art detail',
+        prompt: 'classic still life composition, arranged flowerpot, white background, dramatic chiaroscuro lighting, fine art detail',
         image: 'https://images.unsplash.com/photo-1588263823647-ce3546d42bfe?w=800&q=80',
         color: 0x8b4513 // Saddle Brown
     },
@@ -281,3 +281,4 @@ export const APP_CONFIG = {
     WEBGL_PARTICLE_COUNT_MOBILE: 300
 
 };
+

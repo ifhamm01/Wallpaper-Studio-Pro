@@ -32,7 +32,7 @@ export const GENRES = [
     {
         id: 'cars',
         name: 'Supercars',
-        prompt: 'sleek hypercar on asphalt, dynamic motion blur, glossy reflections, dramatic cinematic lighting',
+        prompt: 'supercar,ferrari,lamborgini,mustang glossy reflections, dramatic cinematic lighting',
         image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&q=80',
         color: 0xdc143c // Crimson Red
     },
@@ -225,6 +225,12 @@ export const STYLES = [
         prompt: 'bold graphic design style, vector art aesthetics, strong typography elements, flat distinct shapes',
         image: 'https://images.unsplash.com/photo-1586974087421-2ba56dab378c'
     },
+     {
+        id: 'hassalblad',
+        name: 'Hassalblad',
+        prompt: 'Shot on a Hasselblad X2D 100C with a 90mm f/2.5 lens, delivering an exceptionally sharp subject against a gorgeously creamy bokeh,Every detail is hyper-realistic:explicitly avoiding any airbrushed or overly smoothed aesthetic, all rendered with the subtle grain and rich, deep tones characteristic of Portra 400 film.',
+        image: 'https://images.unsplash.com/photo-1699229483394-f6eda2c50262'
+    },
     {
         id: 'ink',
         name: 'Ink Wash',
@@ -273,4 +279,5 @@ export const APP_CONFIG = {
     DESKTOP_HEIGHT: 1080,
     WEBGL_PARTICLE_COUNT: 600,
     WEBGL_PARTICLE_COUNT_MOBILE: 300
+
 };
